@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
+
 import Image from "next/image";
 
 import Link from "next/link";
+
+import { useRouter } from "next/navigation";
 
 import { motion } from "framer-motion";
 
@@ -13,7 +17,86 @@ import {
 
 import { FcGoogle } from "react-icons/fc";
 
+import { toast } from "react-hot-toast";
+
+import { authClient } from "@/lib/auth-client";
+
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [formData, setFormData] =
+    useState({
+      email: "",
+      password: "",
+    });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+  };
+
+  // LOGIN FUNCTION
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+      const res =
+        await authClient.signIn.email({
+          email: formData.email,
+          password:
+            formData.password,
+        });
+
+      if (res?.error) {
+        toast.error(
+          res.error.message ||
+            "Invalid email or password"
+        );
+
+        setLoading(false);
+
+        return;
+      }
+
+      toast.success(
+        "Login successful!"
+      );
+
+      router.push("/");
+
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        "Something went wrong"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // GOOGLE LOGIN
+  const handleGoogleLogin =
+    async () => {
+      try {
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: "/",
+        });
+      } catch (error) {
+        toast.error(
+          "Google login failed"
+        );
+      }
+    };
+
   return (
     <section
       className="
@@ -51,13 +134,6 @@ export default function LoginPage() {
           "
         >
           {/* IMAGE */}
-
-
-
-
-
-
-          
           <Image
             src="/images/login-sports.jpg"
             alt="login"
@@ -99,11 +175,11 @@ export default function LoginPage() {
                 "
               >
                 <span className="text-white">
-                  
+                  Sport
                 </span>
 
                 <span className="text-cyan-400">
-                  
+                  Nest
                 </span>
               </h2>
             </Link>
@@ -136,7 +212,8 @@ export default function LoginPage() {
                 "
               >
                 The premium platform
-                for booking high-performance
+                for booking
+                high-performance
                 sports facilities and
                 training grounds.
               </p>
@@ -186,8 +263,8 @@ export default function LoginPage() {
               </div>
 
               <p className="text-gray-300">
-                Join 5,000+ elite athletes
-                today
+                Join 5,000+ elite
+                athletes today
               </p>
             </div>
           </div>
@@ -274,7 +351,10 @@ export default function LoginPage() {
             </div>
 
             {/* FORM */}
-            <form className="mt-10">
+            <form
+              onSubmit={handleLogin}
+              className="mt-10"
+            >
               {/* EMAIL */}
               <div className="mb-6">
                 <label
@@ -305,6 +385,14 @@ export default function LoginPage() {
 
                   <input
                     type="email"
+                    name="email"
+                    required
+                    value={
+                      formData.email
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="name@sportnest.com"
                     className="
                       w-full
@@ -365,6 +453,14 @@ export default function LoginPage() {
 
                   <input
                     type="password"
+                    name="password"
+                    required
+                    value={
+                      formData.password
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="••••••••"
                     className="
                       w-full
@@ -385,6 +481,7 @@ export default function LoginPage() {
                 whileTap={{
                   scale: 0.98,
                 }}
+                disabled={loading}
                 type="submit"
                 className="
                   mt-8
@@ -399,9 +496,12 @@ export default function LoginPage() {
                   duration-300
                   hover:bg-cyan-300
                   shadow-[0_0_30px_rgba(34,211,238,0.35)]
+                  disabled:opacity-60
                 "
               >
-                Login to SportNest →
+                {loading
+                  ? "Logging in..."
+                  : "Login to SportNest →"}
               </motion.button>
             </form>
 
@@ -445,6 +545,9 @@ export default function LoginPage() {
               whileTap={{
                 scale: 0.98,
               }}
+              onClick={
+                handleGoogleLogin
+              }
               className="
                 w-full
                 h-[65px]
@@ -477,7 +580,8 @@ export default function LoginPage() {
                 text-gray-400
               "
             >
-              Don&apos;t have an account?
+              Don&apos;t have an
+              account?
 
               <Link
                 href="/register"
