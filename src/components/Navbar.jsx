@@ -2,61 +2,99 @@
 
 import Link from "next/link";
 
+import Image from "next/image";
+
 import { usePathname } from "next/navigation";
 
-import { FaBars, FaTimes } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 import { motion } from "framer-motion";
 
-import { authClient } from "@/lib/auth-client";
+import {
+  FaBars,
+  FaTimes,
+  FaChevronDown,
+} from "react-icons/fa";
 
-import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const pathname = usePathname();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] =
+    useState(false);
+
+  const [isOpen, setIsOpen] =
+    useState(false);
+
+  const [dropdownOpen, setDropdownOpen] =
+    useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const {
-  data: session,
-} = authClient.useSession();
+    data: session,
+  } = authClient.useSession();
 
-const user = session?.user;
+  const user = session?.user;
 
-  // TEMP USER
-//   const user = false;
+  /* LOGOUT */
+  const handleLogout = async () => {
+    await authClient.signOut();
 
+    window.location.href = "/";
+  };
+
+  /* NAV LINKS */
   const navLinks = [
-  {
-    name: "Home",
-    path: "/",
-  },
+    {
+      name: "Home",
+      path: "/",
+    },
 
-  {
-    name: "All Facilities",
-    path: "/facilities",
-  },
+    {
+      name: "All Facilities",
+      path: "/facilities",
+    },
 
-  ...(user
-    ? [
-        {
-          name: "My Bookings",
-          path: "/my-bookings",
-        },
+    ...(user
+      ? [
+          {
+            name: "My Bookings",
+            path: "/my-bookings",
+          },
 
-        {
-          name: "Add Facility",
-          path: "/add-facility",
-        },
+          {
+            name: "Add Facility",
+            path: "/add-facility",
+          },
 
-        {
-          name:
-            "Manage Facilities",
-          path:
-            "/manage-facilities",
-        },
-      ]
-    : []),
-];
+          {
+            name: "Manage Facilities",
+            path:
+              "/manage-facilities",
+          },
+        ]
+      : []),
+  ];
+
+  /* SAFE IMAGE CHECK */
+  const isValidImage =
+    typeof user?.image === "string" &&
+    (user.image.startsWith(
+      "http://"
+    ) ||
+      user.image.startsWith(
+        "https://"
+      ) ||
+      user.image.startsWith("/"));
+
+  /* INITIAL */
+  const initial =
+    user?.name?.charAt(0)?.toUpperCase() ||
+    "U";
 
   return (
     <header
@@ -151,7 +189,8 @@ const user = session?.user;
                     transition-all
                     duration-300
                     ${
-                      pathname === item.path
+                      pathname ===
+                      item.path
                         ? "text-cyan-400"
                         : "text-gray-300 hover:text-cyan-400"
                     }
@@ -171,7 +210,8 @@ const user = session?.user;
                     transition-all
                     duration-300
                     ${
-                      pathname === item.path
+                      pathname ===
+                      item.path
                         ? "w-full"
                         : "w-0 group-hover:w-full"
                     }
@@ -190,7 +230,8 @@ const user = session?.user;
               flex-shrink-0
             "
           >
-            {!user && (
+            {/* LOGIN BUTTON */}
+            {!mounted ? null : !user ? (
               <Link href="/login">
                 <motion.button
                   whileHover={{
@@ -220,6 +261,266 @@ const user = session?.user;
                   Login
                 </motion.button>
               </Link>
+            ) : (
+              /* USER PROFILE */
+              <div className="relative hidden lg:block">
+                <button
+                  onClick={() =>
+                    setDropdownOpen(
+                      !dropdownOpen
+                    )
+                  }
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    rounded-full
+                    border
+                    border-white/10
+                    bg-white/5
+                    px-3
+                    py-2
+                    hover:bg-white/10
+                    transition-all
+                    duration-300
+                  "
+                >
+                  {/* IMAGE */}
+                  {isValidImage ? (
+                    <Image
+                      src={user.image}
+                      alt="user"
+                      width={42}
+                      height={42}
+                      unoptimized
+                      className="
+                        w-[42px]
+                        h-[42px]
+                        rounded-full
+                        object-cover
+                        border
+                        border-cyan-400/30
+                      "
+                    />
+                  ) : (
+                    <div
+                      className="
+                        w-[42px]
+                        h-[42px]
+                        rounded-full
+                        bg-cyan-400
+                        text-black
+                        font-black
+                        flex
+                        items-center
+                        justify-center
+                        text-lg
+                      "
+                    >
+                      {initial}
+                    </div>
+                  )}
+
+                  {/* NAME */}
+                  <div className="text-left">
+                    <p
+                      className="
+                        text-white
+                        font-semibold
+                        text-sm
+                        leading-none
+                      "
+                    >
+                      {user?.name}
+                    </p>
+
+                    <p
+                      className="
+                        text-gray-400
+                        text-xs
+                        mt-1
+                      "
+                    >
+                      Athlete
+                    </p>
+                  </div>
+
+                  <FaChevronDown
+                    className={`
+                      text-gray-400
+                      text-sm
+                      transition-all
+                      duration-300
+                      ${
+                        dropdownOpen
+                          ? "rotate-180"
+                          : ""
+                      }
+                    `}
+                  />
+                </button>
+
+                {/* DROPDOWN */}
+                {dropdownOpen && (
+                  <div
+                    className="
+                      absolute
+                      right-0
+                      mt-4
+                      w-[260px]
+                      rounded-3xl
+                      border
+                      border-white/10
+                      bg-[#081424]
+                      backdrop-blur-xl
+                      overflow-hidden
+                      shadow-[0_0_40px_rgba(0,0,0,0.45)]
+                    "
+                  >
+                    {/* TOP */}
+                    <div
+                      className="
+                        p-5
+                        border-b
+                        border-white/10
+                        flex
+                        items-center
+                        gap-4
+                      "
+                    >
+                      {isValidImage ? (
+                        <Image
+                          src={user.image}
+                          alt="user"
+                          width={55}
+                          height={55}
+                          unoptimized
+                          className="
+                            w-[55px]
+                            h-[55px]
+                            rounded-full
+                            object-cover
+                            border
+                            border-cyan-400/30
+                          "
+                        />
+                      ) : (
+                        <div
+                          className="
+                            w-[55px]
+                            h-[55px]
+                            rounded-full
+                            bg-cyan-400
+                            text-black
+                            font-black
+                            flex
+                            items-center
+                            justify-center
+                            text-2xl
+                          "
+                        >
+                          {initial}
+                        </div>
+                      )}
+
+                      <div>
+                        <h3
+                          className="
+                            text-white
+                            font-bold
+                          "
+                        >
+                          {user?.name}
+                        </h3>
+
+                        <p
+                          className="
+                            text-gray-400
+                            text-sm
+                            mt-1
+                            break-all
+                          "
+                        >
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* MENU */}
+                    <div className="p-3">
+                      <Link
+                        href="/my-bookings"
+                        className="
+                          flex
+                          items-center
+                          px-4
+                          py-3
+                          rounded-xl
+                          text-gray-300
+                          hover:bg-white/5
+                          hover:text-cyan-400
+                          transition-all
+                        "
+                      >
+                        My Bookings
+                      </Link>
+
+                      <Link
+                        href="/add-facility"
+                        className="
+                          flex
+                          items-center
+                          px-4
+                          py-3
+                          rounded-xl
+                          text-gray-300
+                          hover:bg-white/5
+                          hover:text-cyan-400
+                          transition-all
+                        "
+                      >
+                        Add Facility
+                      </Link>
+
+                      <Link
+                        href="/manage-facilities"
+                        className="
+                          flex
+                          items-center
+                          px-4
+                          py-3
+                          rounded-xl
+                          text-gray-300
+                          hover:bg-white/5
+                          hover:text-cyan-400
+                          transition-all
+                        "
+                      >
+                        Manage Facilities
+                      </Link>
+
+                      <button
+                        onClick={
+                          handleLogout
+                        }
+                        className="
+                          mt-2
+                          w-full
+                          h-[48px]
+                          rounded-xl
+                          bg-cyan-400
+                          text-black
+                          font-bold
+                          hover:bg-cyan-300
+                          transition-all
+                        "
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* MOBILE BUTTON */}
@@ -274,7 +575,8 @@ const user = session?.user;
                     transition-all
                     duration-300
                     ${
-                      pathname === item.path
+                      pathname ===
+                      item.path
                         ? "text-cyan-400"
                         : "text-gray-300 hover:text-cyan-400"
                     }
@@ -284,7 +586,7 @@ const user = session?.user;
                 </Link>
               ))}
 
-              {!user && (
+              {!user ? (
                 <Link href="/login">
                   <button
                     className="
@@ -301,6 +603,78 @@ const user = session?.user;
                     Login
                   </button>
                 </Link>
+              ) : (
+                <>
+                  {/* MOBILE USER */}
+                  <div
+                    className="
+                      mt-3
+                      flex
+                      items-center
+                      gap-3
+                      border-t
+                      border-white/10
+                      pt-5
+                    "
+                  >
+                    {isValidImage ? (
+                      <Image
+                        src={user.image}
+                        alt="user"
+                        width={50}
+                        height={50}
+                        unoptimized
+                        className="
+                          rounded-full
+                          object-cover
+                        "
+                      />
+                    ) : (
+                      <div
+                        className="
+                          w-[50px]
+                          h-[50px]
+                          rounded-full
+                          bg-cyan-400
+                          text-black
+                          font-black
+                          flex
+                          items-center
+                          justify-center
+                          text-xl
+                        "
+                      >
+                        {initial}
+                      </div>
+                    )}
+
+                    <div>
+                      <h3 className="text-white font-bold">
+                        {user?.name}
+                      </h3>
+
+                      <p className="text-gray-400 text-sm break-all">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={
+                      handleLogout
+                    }
+                    className="
+                      w-full
+                      py-3
+                      rounded-xl
+                      bg-cyan-400
+                      text-black
+                      font-bold
+                    "
+                  >
+                    Logout
+                  </button>
+                </>
               )}
             </div>
           </div>
