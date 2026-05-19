@@ -8,38 +8,55 @@ import { FaBars, FaTimes } from "react-icons/fa";
 
 import { motion } from "framer-motion";
 
+import { authClient } from "@/lib/auth-client";
+
 import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const [isOpen, setIsOpen] = useState(false);
+  const {
+  data: session,
+} = authClient.useSession();
+
+const user = session?.user;
 
   // TEMP USER
-  const user = false;
+//   const user = false;
 
   const navLinks = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "All Facilities",
-      path: "/facilities",
-    },
-    {
-      name: "My Bookings",
-      path: "/my-bookings",
-    },
-    {
-      name: "Add Facility",
-      path: "/add-facility",
-    },
-    {
-      name: "Manage Facilities",
-      path: "/manage-facilities",
-    },
-  ];
+  {
+    name: "Home",
+    path: "/",
+  },
+
+  {
+    name: "All Facilities",
+    path: "/facilities",
+  },
+
+  ...(user
+    ? [
+        {
+          name: "My Bookings",
+          path: "/my-bookings",
+        },
+
+        {
+          name: "Add Facility",
+          path: "/add-facility",
+        },
+
+        {
+          name:
+            "Manage Facilities",
+          path:
+            "/manage-facilities",
+        },
+      ]
+    : []),
+];
 
   return (
     <header
