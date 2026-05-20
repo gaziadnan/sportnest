@@ -26,8 +26,10 @@ export default function FacilitiesPage() {
   const [facilities, setFacilities] =
     useState([]);
 
-  const [filteredFacilities, setFilteredFacilities] =
-    useState([]);
+  const [
+    filteredFacilities,
+    setFilteredFacilities,
+  ] = useState([]);
 
   const [search, setSearch] =
     useState("");
@@ -37,6 +39,9 @@ export default function FacilitiesPage() {
 
   const [currentPage, setCurrentPage] =
     useState(1);
+
+  const [totalFacilities, setTotalFacilities] =
+    useState(0);
 
   const router = useRouter();
 
@@ -49,13 +54,24 @@ export default function FacilitiesPage() {
 
   /* FETCH DATA */
   useEffect(() => {
-    fetch("http://localhost:8000/facilities")
+    fetch(
+      `http://localhost:8000/facilities?page=${currentPage}`
+    )
       .then((res) => res.json())
       .then((data) => {
-        setFacilities(data);
-        setFilteredFacilities(data);
+        setFacilities(
+          data.facilities || []
+        );
+
+        setFilteredFacilities(
+          data.facilities || []
+        );
+
+        setTotalFacilities(
+          data.total || 0
+        );
       });
-  }, []);
+  }, [currentPage]);
 
   /* SEARCH + FILTER */
   useEffect(() => {
@@ -63,15 +79,20 @@ export default function FacilitiesPage() {
 
     /* SEARCH */
     if (search) {
-      filtered = filtered.filter((facility) =>
-        facility.name
-          .toLowerCase()
-          .includes(search.toLowerCase())
+      filtered = filtered.filter(
+        (facility) =>
+          facility.name
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
       );
     }
 
     /* FILTER */
-    if (selectedSport !== "All") {
+    if (
+      selectedSport !== "All"
+    ) {
       filtered = filtered.filter(
         (facility) =>
           facility.facility_type ===
@@ -79,8 +100,9 @@ export default function FacilitiesPage() {
       );
     }
 
-    setFilteredFacilities(filtered);
-    setCurrentPage(1);
+    setFilteredFacilities(
+      filtered
+    );
   }, [
     search,
     selectedSport,
@@ -91,27 +113,22 @@ export default function FacilitiesPage() {
   const sports = [
     "All",
     ...new Set(
-      facilities.map(
-        (item) => item.facility_type
-      )
+      facilities?.map(
+        (item) =>
+          item.facility_type
+      ) || []
     ),
   ];
 
   /* PAGINATION */
-  const totalPages = Math.ceil(
-    filteredFacilities.length /
-      itemsPerPage
-  );
-
-  const startIndex =
-    (currentPage - 1) *
-    itemsPerPage;
+  const totalPages =
+    Math.ceil(
+      totalFacilities /
+        itemsPerPage
+    );
 
   const currentFacilities =
-    filteredFacilities.slice(
-      startIndex,
-      startIndex + itemsPerPage
-    );
+    filteredFacilities;
 
   /* PAGE CHANGE */
   const handlePageChange = (

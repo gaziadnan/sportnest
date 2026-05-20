@@ -6,8 +6,13 @@ export default async function FeaturedFacilities() {
   const facilities =
     await getFacilities();
 
+  // const featuredFacilities =
+  //   facilities.slice(0, 6);
   const featuredFacilities =
-    facilities.slice(0, 6);
+  facilities?.facilities?.slice(
+    0,
+    6
+  ) || [];
 
   return (
     <section
