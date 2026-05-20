@@ -8,7 +8,29 @@ import StatCard from "./StatCard";
 
 import heroBg from "@/assets/hero-bg.png";
 
+import { useRouter } from "next/navigation";
+
+import { authClient } from "@/lib/auth-client";
+
 export default function HeroSection() {
+  const router = useRouter();
+
+  const { data: session } =
+    authClient.useSession();
+
+  const user = session?.user;
+
+  const handleStartBooking =
+    () => {
+      if (user) {
+        router.push(
+          "/my-bookings"
+        );
+      } else {
+        router.push("/login");
+      }
+    };
+
   return (
     <section
       className="
@@ -138,6 +160,11 @@ export default function HeroSection() {
             "
           >
             <button
+              onClick={() =>
+                router.push(
+                  "/facilities"
+                )
+              }
               className="
                 px-8
                 h-[56px]
@@ -157,6 +184,9 @@ export default function HeroSection() {
             </button>
 
             <button
+              onClick={
+                handleStartBooking
+              }
               className="
                 px-8
                 h-[56px]
@@ -171,6 +201,7 @@ export default function HeroSection() {
                 transition-all
                 duration-300
                 hover:bg-white/10
+                hover:scale-105
               "
             >
               Start Booking

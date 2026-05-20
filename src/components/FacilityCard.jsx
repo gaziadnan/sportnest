@@ -2,27 +2,53 @@
 
 import Image from "next/image";
 
-import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
-import { FaLocationDot } from "react-icons/fa6";
+import { authClient } from "@/lib/auth-client";
+
+import { toast } from "react-hot-toast";
 
 export default function FacilityCard({
   facility,
 }) {
+  const router = useRouter();
+
+  const { data: session } =
+    authClient.useSession();
+
+  const user = session?.user;
+
+  const handleBookNow = () => {
+    if (!user) {
+      toast.error(
+        "Please login first"
+      );
+
+      router.push("/login");
+
+      return;
+    }
+
+    router.push(
+      `/book-facility/${facility._id}`
+    );
+  };
+
   return (
-    <motion.div
-      whileHover={{
-        y: -8,
-      }}
+    <div
       className="
         group
-        rounded-[28px]
         overflow-hidden
+        rounded-[20px]
         border
         border-white/10
         bg-white/5
-        backdrop-blur-md
-        shadow-[0_0_35px_rgba(0,0,0,0.25)]
+        backdrop-blur-xl
+        hover:border-cyan-400/30
+        transition-all
+        duration-300
+        hover:-translate-y-2
+        hover:shadow-[0_0_35px_rgba(34,211,238,0.15)]
       "
     >
       {/* IMAGE */}
@@ -39,19 +65,9 @@ export default function FacilityCard({
           fill
           className="
             object-cover
+            group-hover:scale-110
             transition-transform
             duration-500
-            group-hover:scale-110
-          "
-        />
-
-        <div
-          className="
-            absolute
-            inset-0
-            bg-gradient-to-t
-            from-black/70
-            to-transparent
           "
         />
 
@@ -61,16 +77,40 @@ export default function FacilityCard({
             absolute
             top-4
             left-4
-            px-4
-            py-2
-            rounded-full
-            bg-cyan-400
-            text-black
-            text-sm
+            bg-cyan-500
+            text-white
+            text-xs
             font-bold
+            px-3
+            py-1
+            rounded-full
           "
         >
-          {facility.facility_type}
+          {
+            facility.facility_type
+          }
+        </div>
+
+        {/* PRICE */}
+        <div
+          className="
+            absolute
+            top-4
+            right-4
+            bg-white
+            text-cyan-600
+            text-sm
+            font-bold
+            px-3
+            py-1
+            rounded-full
+          "
+        >
+          ৳
+          {
+            facility.price_per_hour
+          }
+          /hr
         </div>
       </div>
 
@@ -86,76 +126,37 @@ export default function FacilityCard({
           {facility.name}
         </h2>
 
-        {/* LOCATION */}
-        <div
+        <p
           className="
             mt-3
-            flex
-            items-center
-            gap-2
+            text-sm
+            leading-[1.8]
             text-gray-400
           "
         >
-          <FaLocationDot className="text-cyan-400" />
-
-          <span>{facility.location}</span>
-        </div>
-
-        {/* DESCRIPTION */}
-        <p
-          className="
-            mt-4
-            text-gray-300
-            leading-[1.8]
-            text-sm
-          "
-        >
-          {facility.description.slice(0, 95)}...
+          {facility.description}
         </p>
 
-        {/* PRICE */}
-        <div
+        <button
+          onClick={handleBookNow}
           className="
             mt-6
-            flex
-            items-center
-            justify-between
+            w-full
+            rounded-xl
+            bg-cyan-500
+            py-3
+            text-sm
+            font-semibold
+            text-white
+            transition-all
+            duration-300
+            hover:bg-cyan-400
+            hover:shadow-[0_0_20px_rgba(34,211,238,0.35)]
           "
         >
-          <div>
-            <p className="text-gray-400 text-sm">
-              Price Per Hour
-            </p>
-
-            <h3
-              className="
-                text-cyan-400
-                text-2xl
-                font-black
-              "
-            >
-              ৳ {facility.price_per_hour}
-            </h3>
-          </div>
-
-          <button
-            className="
-              px-5
-              h-[46px]
-              rounded-xl
-              bg-cyan-400
-              text-black
-              font-bold
-              transition-all
-              duration-300
-              hover:bg-cyan-300
-              hover:scale-105
-            "
-          >
-            Book Now
-          </button>
-        </div>
+          Book Now →
+        </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
