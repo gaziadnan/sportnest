@@ -123,7 +123,7 @@ export default function MyBookingsPage() {
         <div className="text-center mb-14">
           <h1
             className="
-              text-4xl
+              text-3xl
               md:text-5xl
               font-black
               text-white
@@ -346,8 +346,8 @@ export default function MyBookingsPage() {
                   <div className="flex-1 w-full">
                     <h2
                       className="
-                        text-3xl
-                        md:text-4xl
+                        text-2xl
+                        md:text-3xl
                         font-black
                         text-white
                         mb-5
@@ -402,7 +402,7 @@ export default function MyBookingsPage() {
                         mt-6
                         text-gray-400
                         leading-[2]
-                        text-[16px]
+                        text-[14px]
                         max-w-[760px]
                       "
                     >
@@ -419,7 +419,7 @@ export default function MyBookingsPage() {
                     <div className="mt-7">
                       <h3
                         className="
-                          text-4xl
+                          text-2xl
                           font-black
                           text-white
                         "
