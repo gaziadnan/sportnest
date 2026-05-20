@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import Image from "next/image";
+
 import { toast } from "react-hot-toast";
 
 import { authClient } from "@/lib/auth-client";
@@ -18,6 +20,8 @@ import {
 import {
   IoMdPricetag,
 } from "react-icons/io";
+
+import heroBg from "@/assets/hero-bg.png";
 
 import {
   HiMiniUsers,
@@ -133,6 +137,7 @@ export default function AddFacilityPage() {
         bg-[#020817]
         px-4
         py-12
+        mt-15
       "
     >
       <div
@@ -805,16 +810,17 @@ export default function AddFacilityPage() {
                 bg-[#071120]
               "
             >
-              <img
-                src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop"
-                alt="sports"
-                className="
-                  h-[320px]
-                  w-full
-                  object-cover
-                "
-              />
-
+              <Image
+  src={heroBg}
+  alt="sports"
+  width={800}
+  height={320}
+  className="
+    h-[320px]
+    w-full
+    object-cover
+  "
+/>
               <div className="p-5">
                 <h2
                   className="

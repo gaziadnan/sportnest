@@ -171,6 +171,7 @@ export default function FacilitiesPage() {
         to-[#020817]
         px-4
         py-20
+        mt-5
       "
     >
       <div className="max-w-[1400px] mx-auto">
@@ -178,7 +179,7 @@ export default function FacilitiesPage() {
         <div className="text-center mb-14">
           <h1
             className="
-              text-4xl
+              text-3xl
               md:text-5xl
               font-black
               text-white
