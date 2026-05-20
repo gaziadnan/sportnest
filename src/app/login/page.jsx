@@ -134,13 +134,13 @@ export default function LoginPage() {
           "
         >
           {/* IMAGE */}
-          <Image
+          {/* <Image
             src="/images/login-sports.jpg"
             alt="login"
             fill
             priority
             className="object-cover"
-          />
+          /> */}
 
           {/* OVERLAY */}
           <div
@@ -175,11 +175,11 @@ export default function LoginPage() {
                 "
               >
                 <span className="text-white">
-                  Sport
+                  
                 </span>
 
                 <span className="text-cyan-400">
-                  Nest
+                
                 </span>
               </h2>
             </Link>

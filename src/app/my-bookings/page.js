@@ -1,353 +1,465 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import Image from "next/image";
+import { toast } from "react-hot-toast";
 
-import { motion } from "framer-motion";
+import {
+  FaCalendar,
+  FaLocationDot,
+} from "react-icons/fa6";
 
-import { toast } from "sonner";
+import { MdAccessTimeFilled } from "react-icons/md";
 
-import { authClient } from "@/lib/auth-client";
+export default function MyBookingsPage() {
+  const [bookings, setBookings] =
+    useState([]);
 
-export default function FacilitiesPage() {
+  const [loading, setLoading] =
+    useState(true);
 
-  const {
-    data: session,
-  } = authClient.useSession();
+  const { data: session } =
+    authClient.useSession();
 
   const user = session?.user;
 
-  const [facilities, setFacilities] =
-    useState([]);
-
-  const [search, setSearch] =
-    useState("");
-
-  const [type, setType] =
-    useState("");
-
-  const [page, setPage] =
-    useState(1);
-
-  const [totalPages, setTotalPages] =
-    useState(1);
-
+  /* FETCH BOOKINGS */
   useEffect(() => {
+    if (!user?.email) return;
 
     fetch(
-      `http://localhost:8000/facilities?search=${search}&type=${type}&page=${page}`
+      `http://localhost:8000/bookings?email=${user.email}`
     )
       .then((res) => res.json())
       .then((data) => {
-
-        setFacilities(
-          data.facilities
-        );
-
-        setTotalPages(
-          Math.ceil(
-            data.total / 9
-          )
-        );
+        setBookings(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
       });
+  }, [user]);
 
-  }, [search, type, page]);
-
-  const handleBooking =
-    async (facility) => {
-
-      if (!user) {
-        toast.error(
-          "Please login first"
+  /* CANCEL BOOKING */
+  const handleCancelBooking =
+    async (id) => {
+      const confirmDelete =
+        confirm(
+          "Are you sure you want to cancel this booking?"
         );
 
+      if (!confirmDelete)
         return;
-      }
 
-      const bookingData = {
-        facilityId: facility._id,
-        facilityName:
-          facility.name,
-        facilityImage:
-          facility.image,
-        price:
-          facility.price_per_hour,
-        userEmail: user.email,
-        userName: user.name,
-        bookingDate:
-          new Date(),
-      };
+      try {
+        const res = await fetch(
+          `http://localhost:8000/bookings/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
 
-      const res = await fetch(
-        "http://localhost:8000/bookings",
-        {
-          method: "POST",
+        const data =
+          await res.json();
 
-          headers: {
-            "content-type":
-              "application/json",
-          },
+        if (data.deletedCount > 0) {
+          toast.success(
+            "Booking cancelled"
+          );
 
-          body: JSON.stringify(
-            bookingData
-          ),
+          const remaining =
+            bookings.filter(
+              (booking) =>
+                booking._id !== id
+            );
+
+          setBookings(
+            remaining
+          );
         }
-      );
-
-      const data =
-        await res.json();
-
-      if (data.insertedId) {
-        toast.success(
-          "Booking Successful!"
+      } catch (error) {
+        toast.error(
+          "Failed to cancel booking"
         );
       }
     };
+
+  /* LOADING */
+  if (loading) {
+    return (
+      <section
+        className="
+          min-h-screen
+          flex
+          justify-center
+          items-center
+          bg-[#020817]
+          text-white
+        "
+      >
+        <h2 className="text-2xl font-bold">
+          Loading...
+        </h2>
+      </section>
+    );
+  }
 
   return (
     <section
       className="
         min-h-screen
-        px-4
-        py-20
         bg-gradient-to-b
         from-[#020817]
         via-[#071120]
         to-[#020817]
+        px-4
+        py-20
       "
     >
-      <div
-        className="
-          max-w-[1400px]
-          mx-auto
-        "
-      >
-        {/* SEARCH */}
-        <div
-          className="
-            flex
-            flex-col
-            md:flex-row
-            gap-5
-            mb-10
-          "
-        >
-          <input
-            type="text"
-            placeholder="Search facility..."
-            value={search}
-            onChange={(e) =>
-              setSearch(
-                e.target.value
-              )
-            }
+      <div className="max-w-[1350px] mx-auto">
+        {/* HEADING */}
+        <div className="text-center mb-14">
+          <h1
             className="
-              flex-1
-              h-14
-              rounded-2xl
-              bg-[#0B1727]
-              border
-              border-white/10
-              px-5
+              text-4xl
+              md:text-5xl
+              font-black
               text-white
-              outline-none
-            "
-          />
-
-          <select
-            value={type}
-            onChange={(e) =>
-              setType(
-                e.target.value
-              )
-            }
-            className="
-              w-full
-              md:w-[240px]
-              h-14
-              rounded-2xl
-              bg-[#0B1727]
-              border
-              border-white/10
-              px-5
-              text-white
-              outline-none
             "
           >
-            <option value="">
-              All Sports
-            </option>
+            My{" "}
+            <span className="text-cyan-400">
+              Bookings
+            </span>
+          </h1>
 
-            <option value="Football">
-              Football
-            </option>
-
-            <option value="Basketball">
-              Basketball
-            </option>
-
-            <option value="Swimming">
-              Swimming
-            </option>
-
-            <option value="Tennis">
-              Tennis
-            </option>
-          </select>
+          <p
+            className="
+              mt-4
+              text-gray-400
+              max-w-[700px]
+              mx-auto
+              leading-[1.9]
+            "
+          >
+            View and manage all your
+            confirmed sports facility
+            bookings.
+          </p>
         </div>
 
-        {/* CARDS */}
-        <div
-          className="
-            grid
-            md:grid-cols-2
-            xl:grid-cols-3
-            gap-8
-          "
-        >
-          {facilities.map(
-            (facility) => (
-              <motion.div
-                key={facility._id}
-                whileHover={{
-                  y: -8,
-                }}
-                className="
-                  rounded-[30px]
-                  overflow-hidden
-                  border
-                  border-white/10
-                  bg-[#0B1727]
-                "
-              >
+        {/* EMPTY */}
+        {bookings.length === 0 && (
+          <div
+            className="
+              text-center
+              py-24
+              border
+              border-white/10
+              rounded-[30px]
+              bg-white/5
+              backdrop-blur-xl
+            "
+          >
+            <h2
+              className="
+                text-3xl
+                font-bold
+                text-white
+              "
+            >
+              No Bookings Found
+            </h2>
+
+            <p className="text-gray-400 mt-3">
+              Book your favourite
+              facility first.
+            </p>
+          </div>
+        )}
+
+        {/* BOOKINGS */}
+        <div className="space-y-7">
+          {bookings.map(
+            (booking) => {
+              const bookingDate =
+                booking.createdAt
+                  ? new Date(
+                      booking.createdAt
+                    )
+                  : new Date();
+
+              const day =
+                bookingDate.getDate();
+
+              const monthYear =
+                bookingDate.toLocaleString(
+                  "en-US",
+                  {
+                    month: "short",
+                    year: "numeric",
+                  }
+                );
+
+              const fullDate =
+                bookingDate.toLocaleDateString(
+                  "en-GB",
+                  {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  }
+                );
+
+              const fullTime =
+                bookingDate.toLocaleTimeString(
+                  "en-US",
+                  {
+                    hour: "2-digit",
+                    minute:
+                      "2-digit",
+                  }
+                );
+
+              return (
                 <div
+                  key={booking._id}
                   className="
-                    relative
-                    h-[260px]
+                    group
+                    flex
+                    flex-col
+                    xl:flex-row
+                    items-center
+                    gap-6
+                    rounded-[30px]
+                    border
+                    border-white/10
+                    bg-white/5
+                    backdrop-blur-xl
+                    p-6
+                    hover:border-cyan-400/30
+                    transition-all
+                    duration-300
+                    shadow-[0_0_40px_rgba(0,0,0,0.25)]
                   "
                 >
-                  <Image
-                    src={
-                      facility.image
-                    }
-                    alt={
-                      facility.name
-                    }
-                    fill
-                    className="
-                      object-cover
-                    "
-                  />
-                </div>
-
-                <div className="p-6">
+                  {/* DATE BOX */}
                   <div
                     className="
+                      w-[120px]
+                      min-w-[120px]
+                      h-[160px]
+                      rounded-[24px]
+                      border
+                      border-cyan-400/20
+                      bg-cyan-500/10
                       flex
+                      flex-col
+                      justify-center
                       items-center
-                      justify-between
                     "
                   >
                     <h2
                       className="
-                        text-2xl
+                        text-5xl
+                        font-black
+                        text-white
+                        leading-none
+                      "
+                    >
+                      {day}
+                    </h2>
+
+                    <p
+                      className="
+                        text-cyan-300
+                        mt-2
+                        text-lg
+                        font-medium
+                      "
+                    >
+                      {monthYear}
+                    </p>
+
+                    <p
+                      className="
+                        text-gray-400
+                        text-sm
+                        mt-2
+                      "
+                    >
+                      {fullTime}
+                    </p>
+                  </div>
+
+                  {/* IMAGE */}
+                  <div
+                    className="
+                      relative
+                      w-full
+                      xl:w-[320px]
+                      h-[210px]
+                      overflow-hidden
+                      rounded-[24px]
+                    "
+                  >
+                    <Image
+                      src={
+                        booking.facilityImage
+                      }
+                      alt={
+                        booking.facilityName
+                      }
+                      fill
+                      sizes="320px"
+                      className="
+                        object-cover
+                        group-hover:scale-105
+                        transition-transform
+                        duration-500
+                      "
+                    />
+
+                    <div
+                      className="
+                        absolute
+                        top-4
+                        left-4
+                        bg-cyan-500
+                        text-white
+                        text-xs
                         font-bold
+                        px-4
+                        py-2
+                        rounded-full
                       "
                     >
                       {
-                        facility.name
+                        booking.facilityType
+                      }
+                    </div>
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="flex-1 w-full">
+                    <h2
+                      className="
+                        text-3xl
+                        md:text-4xl
+                        font-black
+                        text-white
+                        mb-5
+                      "
+                    >
+                      {
+                        booking.facilityName
                       }
                     </h2>
 
-                    <span
+                    {/* META */}
+                    <div
                       className="
-                        text-cyan-400
-                        font-bold
+                        flex
+                        flex-wrap
+                        items-center
+                        gap-6
+                        text-gray-300
+                        text-[15px]
                       "
                     >
-                      $
-                      {
-                        facility.price_per_hour
-                      }
-                      /hr
-                    </span>
+                      <div className="flex items-center gap-2">
+                        <FaCalendar className="text-cyan-400 text-sm" />
+
+                        <span>
+                          {fullDate}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <MdAccessTimeFilled className="text-cyan-400 text-sm" />
+
+                        <span>
+                          {fullTime}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <FaLocationDot className="text-cyan-400 text-sm" />
+
+                        <span>
+                          {
+                            booking.location
+                          }
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* DESCRIPTION */}
+                    <p
+                      className="
+                        mt-6
+                        text-gray-400
+                        leading-[2]
+                        text-[16px]
+                        max-w-[760px]
+                      "
+                    >
+                      Your booking has
+                      been confirmed
+                      successfully.
+                      Enjoy premium
+                      sports facilities
+                      and modern
+                      environment.
+                    </p>
+
+                    {/* PRICE */}
+                    <div className="mt-7">
+                      <h3
+                        className="
+                          text-4xl
+                          font-black
+                          text-white
+                        "
+                      >
+                        ৳
+                        {booking.price}
+                      </h3>
+                    </div>
                   </div>
 
-                  <p
-                    className="
-                      mt-4
-                      text-gray-400
-                      leading-[1.8]
-                    "
-                  >
-                    {
-                      facility.description
-                    }
-                  </p>
-
-                  <button
-                    onClick={() =>
-                      handleBooking(
-                        facility
-                      )
-                    }
-                    className="
-                      mt-6
-                      w-full
-                      h-14
-                      rounded-2xl
-                      bg-cyan-400
-                      text-black
-                      font-bold
-                      hover:bg-cyan-300
-                      transition-all
-                    "
-                  >
-                    Book Now
-                  </button>
+                  {/* BUTTON */}
+                  <div>
+                    <button
+                      onClick={() =>
+                        handleCancelBooking(
+                          booking._id
+                        )
+                      }
+                      className="
+                        h-[58px]
+                        px-10
+                        rounded-full
+                        bg-red-500
+                        text-white
+                        font-bold
+                        text-lg
+                        hover:bg-red-600
+                        transition-all
+                        duration-300
+                        shadow-[0_0_30px_rgba(239,68,68,0.35)]
+                        hover:scale-105
+                      "
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </motion.div>
-            )
+              );
+            }
           )}
-        </div>
-
-        {/* PAGINATION */}
-        <div
-          className="
-            flex
-            justify-center
-            gap-4
-            mt-14
-          "
-        >
-          {[
-            ...Array(totalPages),
-          ].map((_, index) => (
-            <button
-              key={index}
-              onClick={() =>
-                setPage(
-                  index + 1
-                )
-              }
-              className={`
-                w-12
-                h-12
-                rounded-full
-                font-bold
-                transition-all
-                ${
-                  page ===
-                  index + 1
-                    ? "bg-cyan-400 text-black"
-                    : "bg-[#0B1727] text-white border border-white/10"
-                }
-              `}
-            >
-              {index + 1}
-            </button>
-          ))}
         </div>
       </div>
     </section>

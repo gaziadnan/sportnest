@@ -1,78 +1,111 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 import {
   FaSearch,
   FaMapMarkerAlt,
-  FaUsers,
 } from "react-icons/fa";
 
-import { toast } from "sonner";
+import {
+  IoPeopleOutline,
+} from "react-icons/io5";
+
+import {
+  MdAccessTimeFilled,
+} from "react-icons/md";
+
+import { toast } from "react-hot-toast";
+
+import { useRouter } from "next/navigation";
 
 export default function FacilitiesPage() {
+  const [facilities, setFacilities] =
+    useState([]);
 
-  const [facilities, setFacilities] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [filteredFacilities, setFilteredFacilities] =
+    useState([]);
 
-  const [search, setSearch] = useState("");
-  const [sportType, setSportType] = useState("All");
+  const [search, setSearch] =
+    useState("");
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedSport, setSelectedSport] =
+    useState("All");
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  const router = useRouter();
+
+  const { data: session } =
+    authClient.useSession();
+
+  const user = session?.user;
 
   const itemsPerPage = 9;
 
   /* FETCH DATA */
-
   useEffect(() => {
-
     fetch("http://localhost:8000/facilities")
       .then((res) => res.json())
       .then((data) => {
-
         setFacilities(data);
-        setLoading(false);
-
-      })
-      .catch(() => {
-
-        toast.error("Failed to load facilities");
-        setLoading(false);
-
+        setFilteredFacilities(data);
       });
-
   }, []);
 
-  /* FILTER */
+  /* SEARCH + FILTER */
+  useEffect(() => {
+    let filtered = [...facilities];
 
-  const filteredFacilities = useMemo(() => {
-
-    return facilities.filter((facility) => {
-
-      const matchSearch =
+    /* SEARCH */
+    if (search) {
+      filtered = filtered.filter((facility) =>
         facility.name
           .toLowerCase()
-          .includes(search.toLowerCase());
+          .includes(search.toLowerCase())
+      );
+    }
 
-      const matchType =
-        sportType === "All"
-          ? true
-          : facility.facility_type === sportType;
+    /* FILTER */
+    if (selectedSport !== "All") {
+      filtered = filtered.filter(
+        (facility) =>
+          facility.facility_type ===
+          selectedSport
+      );
+    }
 
-      return matchSearch && matchType;
+    setFilteredFacilities(filtered);
+    setCurrentPage(1);
+  }, [
+    search,
+    selectedSport,
+    facilities,
+  ]);
 
-    });
-
-  }, [facilities, search, sportType]);
+  /* SPORTS */
+  const sports = [
+    "All",
+    ...new Set(
+      facilities.map(
+        (item) => item.facility_type
+      )
+    ),
+  ];
 
   /* PAGINATION */
-
   const totalPages = Math.ceil(
-    filteredFacilities.length / itemsPerPage
+    filteredFacilities.length /
+      itemsPerPage
   );
 
   const startIndex =
-    (currentPage - 1) * itemsPerPage;
+    (currentPage - 1) *
+    itemsPerPage;
 
   const currentFacilities =
     filteredFacilities.slice(
@@ -80,445 +113,473 @@ export default function FacilitiesPage() {
       startIndex + itemsPerPage
     );
 
-  /* BOOK NOW */
+  /* PAGE CHANGE */
+  const handlePageChange = (
+    page
+  ) => {
+    setCurrentPage(page);
 
-  const handleBookNow = (facility) => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-    const user =
-      localStorage.getItem("user");
-
+  /* BOOK PAGE NAVIGATION */
+  const handleBookingPage = (
+    facilityId
+  ) => {
     if (!user) {
+      toast.error(
+        "Please login first"
+      );
 
-      toast.error("Please login first");
-
-      window.location.href = "/login";
+      router.push("/login");
 
       return;
     }
 
-    const bookingData = {
-
-      facilityId: facility._id,
-      facilityName: facility.name,
-      image: facility.image,
-      price: facility.price_per_hour,
-      location: facility.location,
-      bookedAt: new Date(),
-
-      userEmail:
-        JSON.parse(user).email,
-
-      userName:
-        JSON.parse(user).name,
-    };
-
-    fetch("http://localhost:8000/bookings", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
-
-      body: JSON.stringify(
-        bookingData
-      ),
-
-    })
-      .then((res) => res.json())
-      .then(() => {
-
-        toast.success(
-          "Facility booked successfully"
-        );
-
-      })
-      .catch(() => {
-
-        toast.error(
-          "Booking failed"
-        );
-
-      });
-  };
-
-  /* LOADING */
-
-  if (loading) {
-
-    return (
-      <div
-        className="
-          min-h-screen
-          flex
-          items-center
-          justify-center
-          bg-[#020817]
-          text-white
-          text-2xl
-          font-bold
-        "
-      >
-        Loading Facilities...
-      </div>
+    router.push(
+      `/book-facility/${facilityId}`
     );
-  }
+  };
 
   return (
     <section
       className="
         min-h-screen
-        px-4
-        py-24
         bg-gradient-to-b
         from-[#020817]
         via-[#071120]
         to-[#020817]
+        px-4
+        py-20
       "
     >
-      <div
-        className="
-          max-w-[1400px]
-          mx-auto
-        "
-      >
-        {/* TOP */}
+      <div className="max-w-[1400px] mx-auto">
+        {/* HEADING */}
+        <div className="text-center mb-14">
+          <h1
+            className="
+              text-4xl
+              md:text-5xl
+              font-black
+              text-white
+            "
+          >
+            Explore Premium{" "}
+            <span className="text-cyan-400">
+              Sports Facilities
+            </span>
+          </h1>
 
+          <p
+            className="
+              mt-5
+              max-w-[750px]
+              mx-auto
+              text-gray-400
+              leading-[1.9]
+            "
+          >
+            Discover world-class
+            sports venues, football
+            arenas, swimming pools,
+            badminton courts, and
+            elite fitness centers
+            designed for modern
+            athletes.
+          </p>
+        </div>
+
+        {/* SEARCH */}
         <div
           className="
             flex
-            flex-col
-            lg:flex-row
-            gap-5
-            justify-between
             items-center
-            mb-12
+            gap-3
+            bg-white/5
+            border
+            border-white/10
+            backdrop-blur-xl
+            rounded-2xl
+            px-5
+            py-4
+            mb-10
           "
         >
-          {/* SEARCH */}
+          <FaSearch className="text-cyan-400 text-lg" />
 
-          <div
-            className="
-              relative
-              w-full
-              lg:w-[450px]
-            "
-          >
-            <FaSearch
-              className="
-                absolute
-                left-5
-                top-1/2
-                -translate-y-1/2
-                text-cyan-400
-              "
-            />
-
-            <input
-              type="text"
-              placeholder="Search by facility name..."
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              className="
-                w-full
-                h-[60px]
-                rounded-2xl
-                bg-white/5
-                border
-                border-white/10
-                pl-14
-                pr-5
-                text-white
-                outline-none
-                focus:border-cyan-400
-              "
-            />
-          </div>
-
-          {/* FILTER */}
-
-          <select
-            value={sportType}
+          <input
+            type="text"
+            placeholder="Search by facility name..."
+            value={search}
             onChange={(e) =>
-              setSportType(
+              setSearch(
                 e.target.value
               )
             }
             className="
               w-full
-              lg:w-[250px]
-              h-[60px]
-              rounded-2xl
-              bg-white/5
+              bg-transparent
+              outline-none
+              text-white
+              placeholder:text-gray-500
+            "
+          />
+        </div>
+
+        <div className="flex gap-8">
+          {/* FILTER */}
+          <div
+            className="
+              hidden
+              lg:block
+              w-[250px]
+              h-fit
+              rounded-[26px]
               border
               border-white/10
-              px-5
-              text-white
-              outline-none
-              focus:border-cyan-400
+              bg-[#071120]
+              p-6
+              shadow-[0_0_30px_rgba(0,0,0,0.25)]
             "
           >
-            <option value="All">
-              All Sports
-            </option>
-
-            <option value="Football">
-              Football
-            </option>
-
-            <option value="Basketball">
-              Basketball
-            </option>
-
-            <option value="Swimming">
-              Swimming
-            </option>
-
-            <option value="Fitness">
-              Fitness
-            </option>
-
-            <option value="Badminton">
-              Badminton
-            </option>
-
-            <option value="Tennis">
-              Tennis
-            </option>
-
-            <option value="Rock Climbing">
-              Rock Climbing
-            </option>
-          </select>
-        </div>
-
-        {/* GRID */}
-
-        <div
-          className="
-            grid
-            grid-cols-1
-            md:grid-cols-2
-            xl:grid-cols-3
-            gap-8
-          "
-        >
-          {currentFacilities.map(
-            (facility) => (
-
-              <div
-                key={facility._id}
+            {/* TOP */}
+            <div
+              className="
+                flex
+                justify-between
+                items-center
+                mb-6
+              "
+            >
+              <h2
                 className="
-                  rounded-[30px]
-                  overflow-hidden
-                  bg-white/5
-                  border
-                  border-white/10
-                  backdrop-blur-xl
-                  transition-all
-                  duration-300
-                  hover:-translate-y-2
-                  hover:border-cyan-400/30
-                  hover:shadow-[0_0_40px_rgba(34,211,238,0.15)]
+                  text-3xl
+                  font-bold
+                  text-white
                 "
               >
-                {/* IMAGE */}
-
-                <div
-                  className="
-                    h-[240px]
-                    overflow-hidden
-                  "
-                >
-                  <img
-                    src={facility.image}
-                    alt={facility.name}
-                    className="
-                      w-full
-                      h-full
-                      object-cover
-                      hover:scale-110
-                      duration-500
-                    "
-                  />
-                </div>
-
-                {/* CONTENT */}
-
-                <div className="p-6">
-
-                  <div
-                    className="
-                      flex
-                      items-start
-                      justify-between
-                      gap-3
-                    "
-                  >
-                    <h2
-                      className="
-                        text-2xl
-                        font-bold
-                        text-white
-                      "
-                    >
-                      {facility.name}
-                    </h2>
-
-                    <span
-                      className="
-                        bg-cyan-400/10
-                        text-cyan-400
-                        px-3
-                        py-1
-                        rounded-full
-                        text-sm
-                        font-semibold
-                      "
-                    >
-                      ৳
-                      {
-                        facility.price_per_hour
-                      }
-                      /hr
-                    </span>
-                  </div>
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      text-gray-400
-                      mt-4
-                    "
-                  >
-                    <FaMapMarkerAlt />
-
-                    <span>
-                      {
-                        facility.location
-                      }
-                    </span>
-                  </div>
-
-                  <div
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      text-gray-400
-                      mt-3
-                    "
-                  >
-                    <FaUsers />
-
-                    <span>
-                      Capacity:
-                      {" "}
-                      {
-                        facility.capacity
-                      }
-                    </span>
-                  </div>
-
-                  <p
-                    className="
-                      mt-5
-                      text-gray-400
-                      leading-[1.8]
-                    "
-                  >
-                    {
-                      facility.description
-                    }
-                  </p>
-
-                  {/* BUTTON */}
-
-                  <button
-                    onClick={() =>
-                      handleBookNow(
-                        facility
-                      )
-                    }
-                    className="
-                      mt-6
-                      w-full
-                      h-[55px]
-                      rounded-2xl
-                      bg-cyan-400
-                      text-black
-                      font-bold
-                      transition-all
-                      duration-300
-                      hover:bg-white
-                    "
-                  >
-                    Book Now
-                  </button>
-
-                </div>
-              </div>
-            )
-          )}
-        </div>
-
-        {/* PAGINATION */}
-
-        <div
-          className="
-            flex
-            justify-center
-            items-center
-            gap-4
-            mt-16
-          "
-        >
-          {[...Array(totalPages)].map(
-            (_, index) => (
+                Filters
+              </h2>
 
               <button
-                key={index}
                 onClick={() =>
-                  setCurrentPage(
-                    index + 1
+                  setSelectedSport(
+                    "All"
                   )
                 }
-                className={`
-                  w-12
-                  h-12
-                  rounded-full
-                  font-bold
-                  transition-all
-                  duration-300
-
-                  ${
-                    currentPage ===
-                    index + 1
-
-                      ? `
-                        bg-cyan-400
-                        text-black
-                      `
-
-                      : `
-                        bg-white/5
-                        border
-                        border-white/10
-                        text-white
-                        hover:border-cyan-400
-                      `
-                  }
-                `}
+                className="
+                  text-cyan-400
+                  text-sm
+                  font-medium
+                "
               >
-                {index + 1}
+                Reset All
               </button>
-            )
-          )}
+            </div>
+
+            <div className="border-b border-white/10 mb-6" />
+
+            {/* SPORT TYPE */}
+            <div>
+              <h3
+                className="
+                  text-gray-300
+                  text-sm
+                  font-bold
+                  tracking-wide
+                  mb-5
+                "
+              >
+                SPORT TYPE
+              </h3>
+
+              <div className="space-y-4">
+                {sports.map(
+                  (
+                    sport,
+                    index
+                  ) => (
+                    <label
+                      key={index}
+                      className="
+                        flex
+                        items-center
+                        gap-3
+                        cursor-pointer
+                        text-gray-300
+                        hover:text-cyan-400
+                        transition-all
+                        duration-300
+                      "
+                    >
+                      <input
+                        type="radio"
+                        name="sport"
+                        checked={
+                          selectedSport ===
+                          sport
+                        }
+                        onChange={() =>
+                          setSelectedSport(
+                            sport
+                          )
+                        }
+                        className="
+                          accent-cyan-400
+                          w-4
+                          h-4
+                        "
+                      />
+
+                      <span>
+                        {sport}
+                      </span>
+                    </label>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* GRID */}
+          <div className="flex-1">
+            <div
+              className="
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                xl:grid-cols-3
+                gap-5
+              "
+            >
+              {currentFacilities.map(
+                (
+                  facility
+                ) => (
+                  <div
+                    key={
+                      facility._id
+                    }
+                    className="
+                      group
+                      overflow-hidden
+                      rounded-[22px]
+                      border
+                      border-white/10
+                      bg-white/5
+                      backdrop-blur-xl
+                      hover:border-cyan-400/30
+                      transition-all
+                      duration-300
+                      hover:-translate-y-2
+                      hover:shadow-[0_0_30px_rgba(34,211,238,0.12)]
+                      max-w-[320px]
+                      mx-auto
+                      w-full
+                    "
+                  >
+                    {/* IMAGE */}
+                    <div
+                      className="
+                        relative
+                        h-[170px]
+                        overflow-hidden
+                      "
+                    >
+                      <Image
+                        src={
+                          facility.image
+                        }
+                        alt={
+                          facility.name
+                        }
+                        fill
+                        sizes="100vw"
+                        className="
+                          object-cover
+                          group-hover:scale-110
+                          transition-transform
+                          duration-500
+                        "
+                      />
+
+                      {/* TYPE */}
+                      <div
+                        className="
+                          absolute
+                          top-4
+                          left-4
+                          bg-cyan-500
+                          text-white
+                          text-xs
+                          font-bold
+                          px-3
+                          py-1
+                          rounded-full
+                        "
+                      >
+                        {
+                          facility.facility_type
+                        }
+                      </div>
+
+                      {/* PRICE */}
+                      <div
+                        className="
+                          absolute
+                          top-4
+                          right-4
+                          bg-white
+                          text-cyan-600
+                          text-sm
+                          font-bold
+                          px-3
+                          py-1
+                          rounded-full
+                        "
+                      >
+                        ৳
+                        {
+                          facility.price_per_hour
+                        }
+                        /hr
+                      </div>
+                    </div>
+
+                    {/* CONTENT */}
+                    <div className="p-5">
+                      <h2
+                        className="
+                          text-xl
+                          font-bold
+                          text-white
+                        "
+                      >
+                        {
+                          facility.name
+                        }
+                      </h2>
+
+                      <div
+                        className="
+                          mt-4
+                          space-y-2
+                          text-gray-400
+                          text-sm
+                        "
+                      >
+                        <div className="flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-cyan-400" />
+
+                          <span>
+                            {
+                              facility.location
+                            }
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <IoPeopleOutline className="text-cyan-400" />
+
+                          <span>
+                            Capacity:{" "}
+                            {
+                              facility.capacity
+                            }
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <MdAccessTimeFilled className="text-cyan-400" />
+
+                          <span>
+                            {
+                              facility
+                                ?.available_slots
+                                ?.length || 0
+                            }{" "}
+                            slots available
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* BUTTON */}
+                      <button
+                        onClick={() =>
+                          handleBookingPage(
+                            facility._id
+                          )
+                        }
+                        className="
+                          mt-5
+                          w-full
+                          rounded-xl
+                          bg-cyan-500
+                          py-2.5
+                          text-sm
+                          font-semibold
+                          text-white
+                          transition-all
+                          duration-300
+                          hover:bg-cyan-400
+                        "
+                      >
+                        Book Now →
+                      </button>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* PAGINATION */}
+            <div
+              className="
+                flex
+                justify-center
+                items-center
+                gap-3
+                mt-14
+                flex-wrap
+              "
+            >
+              {[...Array(totalPages)].map(
+                (
+                  _,
+                  index
+                ) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      handlePageChange(
+                        index +
+                          1
+                      )
+                    }
+                    className={`
+                      w-11
+                      h-11
+                      rounded-full
+                      font-semibold
+                      transition-all
+                      duration-300
+                      ${
+                        currentPage ===
+                        index + 1
+                          ? "bg-cyan-500 text-white shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+                          : "bg-white/5 text-gray-300 hover:bg-cyan-500/20"
+                      }
+                    `}
+                  >
+                    {index + 1}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>
