@@ -1,13 +1,17 @@
+import ReviewSection from "@/components/ClientsReview";
 import FeaturedFacilities from "@/components/FeaturedFacilities";
 import HeroSection from "@/components/HeroSection";
-import WhyChoose from "@/components/Whychoose";
+import WhyChooseUs from "@/components/Whychoose";
+
 
 export default function Home() {
   return (
     <>
       <HeroSection />
       <FeaturedFacilities />
-      <WhyChoose />
+      <WhyChooseUs />
+      <ReviewSection />
+      
     </>
   );
 }

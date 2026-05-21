@@ -1,12 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 
-export default function FeatureOrbitCard({
-  icon,
-  title,
-  description,
-}) {
+export default function FeatureOrbitCard({icon, title, description}) {
   return (
     <motion.div
       whileHover={{
@@ -25,8 +21,7 @@ export default function FeatureOrbitCard({
         transition-all
         duration-300
         hover:border-cyan-400/40
-      "
-    >
+      ">
       <div
         className="
           w-16
@@ -41,8 +36,7 @@ export default function FeatureOrbitCard({
           justify-center
           text-cyan-400
           text-3xl
-        "
-      >
+        ">
         {icon}
       </div>
 
@@ -52,8 +46,7 @@ export default function FeatureOrbitCard({
           text-xl
           font-bold
           text-white
-        "
-      >
+        ">
         {title}
       </h3>
 
@@ -63,8 +56,7 @@ export default function FeatureOrbitCard({
           text-gray-400
           leading-[1.8]
           text-sm
-        "
-      >
+        ">
         {description}
       </p>
     </motion.div>

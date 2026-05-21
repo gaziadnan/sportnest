@@ -18,7 +18,8 @@ export default async function FeaturedFacilities() {
     <section
       className="
         relative
-        py-24
+        pt-24
+        pb-14
         px-4
         overflow-hidden
         bg-gradient-to-b

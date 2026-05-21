@@ -98,6 +98,7 @@ export default function AddFacilityPage() {
       const res = await fetch(
         "http://localhost:8000/facilities",
         {
+         
           method: "POST",
           headers: {
             "Content-Type":
@@ -733,12 +734,12 @@ export default function AddFacilityPage() {
                 <div
                   className="
                     rounded-full
-                    bg-green-500/10
+                    bg-cyan-500/10
                     px-3
                     py-1
                     text-[10px]
                     font-semibold
-                    text-green-400
+                    text-cyan-400
                   "
                 >
                   VERIFIED
@@ -778,11 +779,11 @@ export default function AddFacilityPage() {
                   h-[46px]
                   px-7
                   rounded-xl
-                  bg-green-500
+                  bg-cyan-600
                   text-sm
                   font-semibold
                   text-white
-                  hover:bg-green-400
+                  hover:bg-cyan-500
                   transition-all
                 "
               >

@@ -321,8 +321,12 @@ export default function ManageFacilitiesPage() {
                 h-[45px]
                 px-5
                 rounded-xl
-                bg-green-600
-                hover:bg-green-500
+
+                bg-cyan-600
+             hover:bg-cyan-500
+
+
+               
                 transition-all
                 duration-300
                 text-white
@@ -602,8 +606,8 @@ export default function ManageFacilitiesPage() {
                             px-4
                             py-2
                             rounded-xl
-                            bg-green-500/15
-                            text-green-400
+                            bg-cyan-500/15
+                            text-cyan-400
                             text-xs
                             font-semibold
                           "
@@ -1022,8 +1026,8 @@ export default function ManageFacilitiesPage() {
                   w-9
                   h-9
                   rounded-lg
-                  bg-green-600
-                  hover:bg-green-500
+                  bg-cyan-600
+                  hover:bg-cyan-500
                   text-white
                   flex
                   items-center
@@ -1047,8 +1051,8 @@ export default function ManageFacilitiesPage() {
                       px-2
                       py-1
                       rounded-full
-                      bg-green-100
-                      text-green-700
+                      bg-cyan-100
+                      text-cyan-700
                       text-[10px]
                       flex
                       items-center
@@ -1134,8 +1138,8 @@ export default function ManageFacilitiesPage() {
                 flex-1
                 h-9
                 rounded-lg
-                bg-green-600
-                hover:bg-green-500
+                bg-cyan-600
+                hover:bg-cyan-500
                 text-white
                 text-xs
                 font-medium

@@ -1,29 +1,25 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import {authClient} from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import {useRouter} from "next/navigation";
+import {use, useEffect, useState} from "react";
 
-import {
-  FaArrowLeft,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import {FaArrowLeft, FaCalendarAlt, FaMapMarkerAlt} from "react-icons/fa";
 
-import { IoPeopleOutline } from "react-icons/io5";
+import {IoPeopleOutline} from "react-icons/io5";
 
-import { MdAccessTimeFilled } from "react-icons/md";
+import {MdAccessTimeFilled} from "react-icons/md";
 
-import { toast } from "react-hot-toast";
+import {toast} from "react-hot-toast";
 
-export default function BookFacilityPage({ params }) {
-  const { id } = use(params);
+export default function BookFacilityPage({params}) {
+  const {id} = use(params);
 
   const router = useRouter();
 
-  const { data: session } = authClient.useSession();
+  const {data: session} = authClient.useSession();
 
   const user = session?.user;
 
@@ -97,8 +93,7 @@ export default function BookFacilityPage({ params }) {
   }
 
   /* TOTAL PRICE */
-  const totalPrice =
-    Number(facility.price_per_hour) * Number(duration);
+  const totalPrice = Number(facility.price_per_hour) * Number(duration);
 
   /* CONFIRM BOOKING */
   const handleConfirmBooking = async () => {
@@ -108,64 +103,52 @@ export default function BookFacilityPage({ params }) {
       return;
     }
 
-   const bookingData = {
-  facilityId: facility._id,
+    const bookingData = {
+      facilityId: facility._id,
 
-  facilityName: facility.name,
+      facilityName: facility.name,
 
-  facilityImage: facility.image,
+      facilityImage: facility.image,
 
-  facilityType: facility.facility_type,
+      facilityType: facility.facility_type,
 
-  location: facility.location,
+      location: facility.location,
 
-  price: facility.price_per_hour,
+      price: facility.price_per_hour,
 
-  bookingDate: bookingDate,
+      bookingDate: bookingDate,
 
-  bookingSlot: selectedSlot,
+      bookingSlot: selectedSlot,
 
-  duration: duration,
+      duration: duration,
 
-  userName: user.name,
+      userName: user.name,
 
-  userEmail: user.email,
+      userEmail: user.email,
 
-  createdAt: new Date(),
-};
+      createdAt: new Date(),
+    };
     try {
-      const res = await fetch(
-        "http://localhost:8000/bookings",
+      const res = await fetch("http://localhost:8000/bookings", 
         {
-          method: "POST",
+        method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-          body: JSON.stringify(
-            bookingData
-          ),
-        }
-      );
+        body: JSON.stringify(bookingData),
+      });
 
-      const data =
-        await res.json();
+      const data = await res.json();
 
       if (data.insertedId) {
-        toast.success(
-          "Booking Confirmed Successfully!"
-        );
+        toast.success("Booking Confirmed Successfully!");
 
-        router.push(
-          "/my-bookings"
-        );
+        router.push("/my-bookings");
       }
     } catch (error) {
-      toast.error(
-        "Booking Failed"
-      );
+      toast.error("Booking Failed");
     }
   };
 
@@ -199,9 +182,7 @@ export default function BookFacilityPage({ params }) {
           ">
           <FaArrowLeft />
 
-          <span>
-            Back to Facilities
-          </span>
+          <span>Back to Facilities</span>
         </Link>
 
         {/* MAIN GRID */}
@@ -256,9 +237,7 @@ export default function BookFacilityPage({ params }) {
                   py-2
                   rounded-full
                 ">
-                {
-                  facility.facility_type
-                }
+                {facility.facility_type}
               </div>
             </div>
 
@@ -293,9 +272,7 @@ export default function BookFacilityPage({ params }) {
                   <div className="flex items-center gap-2 text-cyan-400 text-sm">
                     <FaMapMarkerAlt />
 
-                    <span>
-                      Location
-                    </span>
+                    <span>Location</span>
                   </div>
 
                   <p
@@ -304,9 +281,7 @@ export default function BookFacilityPage({ params }) {
                       font-semibold
                       mt-2
                     ">
-                    {
-                      facility.location
-                    }
+                    {facility.location}
                   </p>
                 </div>
 
@@ -322,9 +297,7 @@ export default function BookFacilityPage({ params }) {
                   <div className="flex items-center gap-2 text-cyan-400 text-sm">
                     <IoPeopleOutline />
 
-                    <span>
-                      Capacity
-                    </span>
+                    <span>Capacity</span>
                   </div>
 
                   <p
@@ -333,11 +306,7 @@ export default function BookFacilityPage({ params }) {
                       font-semibold
                       mt-2
                     ">
-                    Up to{" "}
-                    {
-                      facility.capacity
-                    }{" "}
-                    players
+                    Up to {facility.capacity} players
                   </p>
                 </div>
 
@@ -351,13 +320,9 @@ export default function BookFacilityPage({ params }) {
                     p-5
                   ">
                   <div className="flex items-center gap-2 text-cyan-400 text-sm">
-                    <span>
-                      ৳
-                    </span>
+                    <span>৳</span>
 
-                    <span>
-                      Price
-                    </span>
+                    <span>Price</span>
                   </div>
 
                   <p
@@ -366,10 +331,7 @@ export default function BookFacilityPage({ params }) {
                       font-semibold
                       mt-2
                     ">
-                    ৳
-                    {
-                      facility.price_per_hour
-                    }
+                    ৳{facility.price_per_hour}
                     /hour
                   </p>
                 </div>
@@ -386,9 +348,7 @@ export default function BookFacilityPage({ params }) {
                   <div className="flex items-center gap-2 text-cyan-400 text-sm">
                     <MdAccessTimeFilled />
 
-                    <span>
-                      Slots
-                    </span>
+                    <span>Slots</span>
                   </div>
 
                   <p
@@ -397,12 +357,7 @@ export default function BookFacilityPage({ params }) {
                       font-semibold
                       mt-2
                     ">
-                    {
-                      facility
-                        ?.available_slots
-                        ?.length
-                    }{" "}
-                    available
+                    {facility?.available_slots?.length} available
                   </p>
                 </div>
               </div>
@@ -459,7 +414,8 @@ export default function BookFacilityPage({ params }) {
             </h2>
 
             <p className="text-gray-400 mt-3">
-              Fill all booking information carefully to confirm your reservation.
+              Fill all booking information carefully to confirm your
+              reservation.
             </p>
 
             {/* FORM */}
@@ -508,18 +464,13 @@ export default function BookFacilityPage({ params }) {
                     mb-2
                   ">
                   <FaCalendarAlt />
-
                   Booking Date
                 </label>
 
                 <input
                   type="date"
                   value={bookingDate}
-                  onChange={(e) =>
-                    setBookingDate(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setBookingDate(e.target.value)}
                   className="
                     w-full
                     h-[55px]
@@ -549,11 +500,7 @@ export default function BookFacilityPage({ params }) {
 
                 <select
                   value={selectedSlot}
-                  onChange={(e) =>
-                    setSelectedSlot(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setSelectedSlot(e.target.value)}
                   className="
                     w-full
                     h-[55px]
@@ -565,25 +512,15 @@ export default function BookFacilityPage({ params }) {
                     text-white
                     outline-none
                   ">
-                  <option
-                    value=""
-                    className="text-black">
+                  <option value="" className="text-black">
                     Select Slot
                   </option>
 
-                  {facility?.available_slots?.map(
-                    (
-                      slot,
-                      index
-                    ) => (
-                      <option
-                        key={index}
-                        value={slot}
-                        className="text-black">
-                        {slot}
-                      </option>
-                    )
-                  )}
+                  {facility?.available_slots?.map((slot, index) => (
+                    <option key={index} value={slot} className="text-black">
+                      {slot}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -604,11 +541,7 @@ export default function BookFacilityPage({ params }) {
                   type="number"
                   min="1"
                   value={duration}
-                  onChange={(e) =>
-                    setDuration(
-                      e.target.value
-                    )
-                  }
+                  onChange={(e) => setDuration(e.target.value)}
                   className="
                     w-full
                     h-[55px]
@@ -634,17 +567,11 @@ export default function BookFacilityPage({ params }) {
                 ">
                 <div className="flex justify-between text-gray-300">
                   <span>
-                    ৳
-                    {
-                      facility.price_per_hour
-                    }
+                    ৳{facility.price_per_hour}
                     /hr × {duration} hr
                   </span>
 
-                  <span>
-                    ৳
-                    {totalPrice}
-                  </span>
+                  <span>৳{totalPrice}</span>
                 </div>
 
                 <div
@@ -669,22 +596,15 @@ export default function BookFacilityPage({ params }) {
                       font-black
                       text-cyan-400
                     ">
-                    ৳
-                    {totalPrice}
+                    ৳{totalPrice}
                   </span>
                 </div>
               </div>
 
               {/* BUTTON */}
               <button
-                onClick={
-                  handleConfirmBooking
-                }
-                disabled={
-                  !bookingDate ||
-                  !selectedSlot ||
-                  !duration
-                }
+                onClick={handleConfirmBooking}
+                disabled={!bookingDate || !selectedSlot || !duration}
                 className={`
                   w-full
                   h-[60px]
@@ -694,9 +614,7 @@ export default function BookFacilityPage({ params }) {
                   transition-all
                   duration-300
                   ${
-                    !bookingDate ||
-                    !selectedSlot ||
-                    !duration
+                    !bookingDate || !selectedSlot || !duration
                       ? "bg-gray-600 cursor-not-allowed text-gray-300"
                       : "bg-cyan-500 hover:bg-cyan-400 hover:scale-[1.02] text-white shadow-[0_0_25px_rgba(34,211,238,0.25)]"
                   }

@@ -56,7 +56,9 @@ export default function MyBookingsPage() {
       try {
         const res = await fetch(
           `http://localhost:8000/bookings/${id}`,
+          
           {
+           
             method: "DELETE",
           }
         );
