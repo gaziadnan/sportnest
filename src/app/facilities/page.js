@@ -400,75 +400,75 @@ export default function FacilitiesPage() {
                     "
                   >
                     {/* IMAGE */}
-                    <div
-                      className="
-                        relative
-                        h-[170px]
-                        overflow-hidden
-                      "
-                    >
-                      <Image
-                        src={
-                          facility.image
-                        }
-                        alt={
-                          facility.name
-                        }
-                        fill
-                        sizes="100vw"
-                        className="
-                          object-cover
-                          group-hover:scale-110
-                          transition-transform
-                          duration-500
-                        "
-                      />
+                    {/* IMAGE */}
+{facility.image && (
+  <div
+    className="
+      relative
+      h-[170px]
+      overflow-hidden
+    "
+  >
+    <Image
+      src={facility.image}
+      alt={facility.name}
+      fill
+      sizes="100vw"
+      className="
+        object-cover
+        group-hover:scale-110
+        transition-transform
+        duration-500
+      "
+    />
 
-                      {/* TYPE */}
-                      <div
-                        className="
-                          absolute
-                          top-4
-                          left-4
-                          bg-cyan-500
-                          text-white
-                          text-xs
-                          font-bold
-                          px-3
-                          py-1
-                          rounded-full
-                        "
-                      >
-                        {
-                          facility.facility_type
-                        }
-                      </div>
+    {/* TYPE */}
+    <div
+      className="
+        absolute
+        top-4
+        left-4
+        bg-cyan-500
+        text-white
+        text-xs
+        font-bold
+        px-3
+        py-1
+        rounded-full
+      "
+    >
+      {facility.facility_type}
+    </div>
 
-                      {/* PRICE */}
-                      <div
-                        className="
-                          absolute
-                          top-4
-                          right-4
-                          bg-white
-                          text-cyan-600
-                          text-sm
-                          font-bold
-                          px-3
-                          py-1
-                          rounded-full
-                        "
-                      >
-                        ৳
-                        {
-                          facility.price_per_hour
-                        }
-                        /hr
-                      </div>
-                    </div>
+    {/* PRICE */}
+    <div
+      className="
+        absolute
+        top-4
+        right-4
+        bg-white
+        text-cyan-600
+        text-sm
+        font-bold
+        px-3
+        py-1
+        rounded-full
+      "
+    >
+      ৳{facility.price_per_hour}/hr
+    </div>
+  </div>
+)}
+                    
 
                     {/* CONTENT */}
-                    <div className="p-5">
+                    <div
+  className={
+    facility.image
+      ? "p-5"
+      : "p-6"
+  }
+>
                       <h2
                         className="
                           text-xl
