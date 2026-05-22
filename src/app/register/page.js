@@ -146,6 +146,7 @@ const handleRegister = async (e) => {
         justify-center
         px-4
         py-8
+        mt-10
       "
     >
       <div
