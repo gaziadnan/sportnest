@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-import Image from "next/image";
-
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
@@ -106,19 +104,20 @@ export default function LoginPage() {
         items-center
         justify-center
         px-4
-        py-10
+        py-6
+        mt-17
       "
     >
       <div
         className="
           w-full
-          max-w-[1400px]
-          rounded-[40px]
+          max-w-[1150px]
+          rounded-[28px]
           overflow-hidden
           border
           border-white/10
           bg-[#071120]
-          shadow-[0_0_60px_rgba(0,0,0,0.35)]
+          shadow-[0_0_40px_rgba(0,0,0,0.35)]
           grid
           grid-cols-1
           lg:grid-cols-2
@@ -130,18 +129,9 @@ export default function LoginPage() {
             relative
             hidden
             lg:block
-            min-h-[900px]
+            min-h-[700px]
           "
         >
-          {/* IMAGE */}
-          {/* <Image
-            src="/images/login-sports.jpg"
-            alt="login"
-            fill
-            priority
-            className="object-cover"
-          /> */}
-
           {/* OVERLAY */}
           <div
             className="
@@ -163,24 +153,19 @@ export default function LoginPage() {
               flex
               flex-col
               justify-between
-              p-12
+              p-8
             "
           >
             {/* LOGO */}
             <Link href="/">
               <h2
                 className="
-                  text-4xl
+                  text-2xl
                   font-black
+                  text-white
                 "
               >
-                <span className="text-white">
-                  
-                </span>
-
-                <span className="text-cyan-400">
                 
-                </span>
               </h2>
             </Link>
 
@@ -188,9 +173,9 @@ export default function LoginPage() {
             <div>
               <h1
                 className="
-                  text-7xl
+                  text-5xl
                   font-black
-                  leading-[1.1]
+                  leading-[1.15]
                   text-white
                 "
               >
@@ -204,10 +189,10 @@ export default function LoginPage() {
 
               <p
                 className="
-                  mt-8
-                  max-w-[550px]
-                  text-xl
-                  leading-[1.9]
+                  mt-5
+                  max-w-[420px]
+                  text-sm
+                  leading-7
                   text-gray-300
                 "
               >
@@ -224,14 +209,14 @@ export default function LoginPage() {
               className="
                 flex
                 items-center
-                gap-5
+                gap-4
               "
             >
-              <div className="flex -space-x-3">
+              <div className="flex -space-x-2">
                 <div
                   className="
-                    w-12
-                    h-12
+                    w-9
+                    h-9
                     rounded-full
                     border-2
                     border-[#071120]
@@ -241,8 +226,8 @@ export default function LoginPage() {
 
                 <div
                   className="
-                    w-12
-                    h-12
+                    w-9
+                    h-9
                     rounded-full
                     border-2
                     border-[#071120]
@@ -252,8 +237,8 @@ export default function LoginPage() {
 
                 <div
                   className="
-                    w-12
-                    h-12
+                    w-9
+                    h-9
                     rounded-full
                     border-2
                     border-[#071120]
@@ -262,9 +247,8 @@ export default function LoginPage() {
                 />
               </div>
 
-              <p className="text-gray-300">
-                Join 5,000+ elite
-                athletes today
+              <p className="text-sm text-gray-300">
+                Join 5,000+ athletes
               </p>
             </div>
           </div>
@@ -277,9 +261,9 @@ export default function LoginPage() {
             flex
             items-center
             justify-center
-            px-6
-            md:px-12
-            py-16
+            px-5
+            md:px-8
+            py-10
             bg-gradient-to-b
             from-[#071120]
             to-[#020817]
@@ -289,11 +273,11 @@ export default function LoginPage() {
           <div
             className="
               absolute
-              w-[350px]
-              h-[350px]
+              w-[250px]
+              h-[250px]
               rounded-full
               bg-cyan-400/10
-              blur-[120px]
+              blur-[100px]
             "
           />
 
@@ -301,35 +285,35 @@ export default function LoginPage() {
           <motion.div
             initial={{
               opacity: 0,
-              y: 30,
+              y: 20,
             }}
             animate={{
               opacity: 1,
               y: 0,
             }}
             transition={{
-              duration: 0.6,
+              duration: 0.5,
             }}
             className="
               relative
               z-10
               w-full
-              max-w-[520px]
-              rounded-[32px]
+              max-w-[430px]
+              rounded-[24px]
               border
               border-white/10
               bg-white/5
               backdrop-blur-xl
-              p-8
-              md:p-10
-              shadow-[0_0_50px_rgba(0,0,0,0.25)]
+              p-6
+              md:p-7
+              shadow-[0_0_40px_rgba(0,0,0,0.25)]
             "
           >
             {/* TITLE */}
             <div>
               <h2
                 className="
-                  text-5xl
+                  text-3xl
                   font-black
                   text-white
                 "
@@ -339,30 +323,31 @@ export default function LoginPage() {
 
               <p
                 className="
-                  mt-4
+                  mt-2
+                  text-sm
                   text-gray-400
-                  leading-[1.8]
+                  leading-6
                 "
               >
-                Enter your credentials
-                to access your sports
-                dashboard.
+                Login to access your
+                sports dashboard.
               </p>
             </div>
 
             {/* FORM */}
             <form
               onSubmit={handleLogin}
-              className="mt-10"
+              className="mt-7"
             >
               {/* EMAIL */}
-              <div className="mb-6">
+              <div className="mb-4">
                 <label
                   className="
                     block
-                    mb-3
+                    mb-2
+                    text-sm
                     text-white
-                    font-semibold
+                    font-medium
                   "
                 >
                   Email Address
@@ -372,16 +357,16 @@ export default function LoginPage() {
                   className="
                     flex
                     items-center
-                    gap-4
-                    rounded-2xl
+                    gap-3
+                    rounded-xl
                     border
                     border-white/10
                     bg-[#0B1629]
-                    px-5
-                    h-[65px]
+                    px-4
+                    h-[52px]
                   "
                 >
-                  <FaEnvelope className="text-cyan-400 text-lg" />
+                  <FaEnvelope className="text-cyan-400 text-sm" />
 
                   <input
                     type="email"
@@ -398,6 +383,7 @@ export default function LoginPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -412,13 +398,14 @@ export default function LoginPage() {
                     flex
                     items-center
                     justify-between
-                    mb-3
+                    mb-2
                   "
                 >
                   <label
                     className="
+                      text-sm
                       text-white
-                      font-semibold
+                      font-medium
                     "
                   >
                     Password
@@ -428,7 +415,7 @@ export default function LoginPage() {
                     type="button"
                     className="
                       text-cyan-400
-                      text-sm
+                      text-xs
                       hover:underline
                     "
                   >
@@ -440,16 +427,16 @@ export default function LoginPage() {
                   className="
                     flex
                     items-center
-                    gap-4
-                    rounded-2xl
+                    gap-3
+                    rounded-xl
                     border
                     border-white/10
                     bg-[#0B1629]
-                    px-5
-                    h-[65px]
+                    px-4
+                    h-[52px]
                   "
                 >
-                  <FaLock className="text-cyan-400 text-lg" />
+                  <FaLock className="text-cyan-400 text-sm" />
 
                   <input
                     type="password"
@@ -466,6 +453,7 @@ export default function LoginPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -476,7 +464,7 @@ export default function LoginPage() {
               {/* LOGIN BUTTON */}
               <motion.button
                 whileHover={{
-                  scale: 1.02,
+                  scale: 1.01,
                 }}
                 whileTap={{
                   scale: 0.98,
@@ -484,24 +472,24 @@ export default function LoginPage() {
                 disabled={loading}
                 type="submit"
                 className="
-                  mt-8
+                  mt-6
                   w-full
-                  h-[65px]
-                  rounded-2xl
+                  h-[52px]
+                  rounded-xl
                   bg-cyan-400
                   text-black
-                  text-lg
+                  text-sm
                   font-bold
                   transition-all
                   duration-300
                   hover:bg-cyan-300
-                  shadow-[0_0_30px_rgba(34,211,238,0.35)]
+                  shadow-[0_0_20px_rgba(34,211,238,0.35)]
                   disabled:opacity-60
                 "
               >
                 {loading
                   ? "Logging in..."
-                  : "Login to SportNest →"}
+                  : "Login to SportNest"}
               </motion.button>
             </form>
 
@@ -509,7 +497,7 @@ export default function LoginPage() {
             <div
               className="
                 relative
-                my-8
+                my-6
                 flex
                 items-center
                 justify-center
@@ -527,10 +515,10 @@ export default function LoginPage() {
               <span
                 className="
                   relative
-                  px-4
+                  px-3
                   bg-[#091323]
                   text-gray-400
-                  text-sm
+                  text-xs
                 "
               >
                 OR
@@ -540,7 +528,7 @@ export default function LoginPage() {
             {/* GOOGLE BUTTON */}
             <motion.button
               whileHover={{
-                scale: 1.02,
+                scale: 1.01,
               }}
               whileTap={{
                 scale: 0.98,
@@ -550,24 +538,25 @@ export default function LoginPage() {
               }
               className="
                 w-full
-                h-[65px]
-                rounded-2xl
+                h-[52px]
+                rounded-xl
                 border
                 border-white/10
                 bg-white/5
                 flex
                 items-center
                 justify-center
-                gap-4
+                gap-3
                 text-white
-                font-semibold
+                text-sm
+                font-medium
                 transition-all
                 duration-300
                 hover:border-cyan-400/30
                 hover:bg-white/10
               "
             >
-              <FcGoogle className="text-2xl" />
+              <FcGoogle className="text-xl" />
 
               Continue with Google
             </motion.button>
@@ -575,8 +564,9 @@ export default function LoginPage() {
             {/* REGISTER */}
             <p
               className="
-                mt-8
+                mt-6
                 text-center
+                text-sm
                 text-gray-400
               "
             >
@@ -592,7 +582,7 @@ export default function LoginPage() {
                   hover:underline
                 "
               >
-                Sign up for free
+                Sign up
               </Link>
             </p>
           </motion.div>

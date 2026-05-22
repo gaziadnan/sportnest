@@ -59,7 +59,6 @@ export default function RegisterPage() {
       [name]: value,
     });
 
-    // LIVE PASSWORD VALIDATION
     if (name === "password") {
       setPasswordError(
         validatePassword(value)
@@ -68,53 +67,62 @@ export default function RegisterPage() {
   };
 
   // REGISTER
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  // REGISTER
+const handleRegister = async (e) => {
+  e.preventDefault();
 
-    const error = validatePassword(
-      formData.password
-    );
+  const error = validatePassword(
+    formData.password
+  );
 
-    if (error) {
-      setPasswordError(error);
+  if (error) {
+    setPasswordError(error);
 
-      toast.error(error);
+    toast.error(error);
+
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // ACCOUNT CREATE
+    const res = await authClient.signUp.email({
+      email: formData.email,
+      password: formData.password,
+      name: formData.name,
+      image: formData.image,
+    });
+
+    // ERROR HANDLE
+    if (res.error) {
+      toast.error(
+        res.error.message ||
+          "Registration failed"
+      );
 
       return;
     }
 
-    try {
-      setLoading(true);
+    // AUTO LOGIN REMOVE
+    await authClient.signOut();
 
-      const res = await authClient.signUp.email({
-        email: formData.email,
-        password: formData.password,
-        name: formData.name,
-        image: formData.image,
-      });
+    toast.success(
+      "Registration successful! Please login."
+    );
 
-      if (res.error) {
-        toast.error(
-          res.error.message ||
-            "Registration failed"
-        );
+    // LOGIN PAGE REDIRECT
+    router.push("/login");
 
-        return;
-      }
+  } catch (error) {
+    toast.error(
+      "Something went wrong. Try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
-      toast.success(
-        "Registration completed successfully!"
-      );
-
-      router.push("/login");
-    } catch (error) {
-      toast.error(
-        "Something went wrong. Try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // GOOGLE LOGIN
   const handleGoogleLogin = async () => {
@@ -137,15 +145,14 @@ export default function RegisterPage() {
         items-center
         justify-center
         px-4
-        py-10
+        py-8
       "
     >
       <div
         className="
           w-full
-          max-w-[1400px]
-          min-h-[820px]
-          rounded-[32px]
+          max-w-[1180px]
+          rounded-[28px]
           overflow-hidden
           border
           border-cyan-400/10
@@ -153,7 +160,7 @@ export default function RegisterPage() {
           from-[#071120]
           via-[#081424]
           to-[#020817]
-          shadow-[0_0_60px_rgba(0,0,0,0.45)]
+          shadow-[0_0_50px_rgba(0,0,0,0.45)]
           grid
           lg:grid-cols-2
         "
@@ -165,7 +172,8 @@ export default function RegisterPage() {
             hidden
             lg:flex
             items-center
-            px-16
+            px-12
+            py-10
             overflow-hidden
           "
         >
@@ -193,13 +201,13 @@ export default function RegisterPage() {
             className="
               relative
               z-10
-              max-w-[500px]
+              max-w-[420px]
             "
           >
             <Link href="/">
               <h1
                 className="
-                  text-3xl
+                  text-2xl
                   font-black
                   cursor-pointer
                 "
@@ -227,9 +235,9 @@ export default function RegisterPage() {
                 duration: 0.7,
               }}
               className="
-                mt-20
-                text-6xl
-                leading-[1.1]
+                mt-14
+                text-4xl
+                leading-[1.15]
                 font-black
                 text-white
               "
@@ -247,10 +255,10 @@ export default function RegisterPage() {
 
             <p
               className="
-                mt-8
+                mt-6
                 text-gray-300
-                text-lg
-                leading-[1.9]
+                text-sm
+                leading-7
               "
             >
               Book premium sports facilities,
@@ -267,9 +275,9 @@ export default function RegisterPage() {
             flex
             items-center
             justify-center
-            px-6
-            md:px-10
-            py-12
+            px-5
+            md:px-8
+            py-8
           "
         >
           <motion.div
@@ -286,21 +294,21 @@ export default function RegisterPage() {
             }}
             className="
               w-full
-              max-w-[520px]
-              rounded-[30px]
+              max-w-[430px]
+              rounded-[24px]
               border
               border-white/10
               bg-white/5
               backdrop-blur-xl
-              p-8
-              md:p-10
+              p-6
+              md:p-7
             "
           >
             {/* TITLE */}
             <div>
               <h2
                 className="
-                  text-4xl
+                  text-3xl
                   font-black
                   text-white
                 "
@@ -310,9 +318,10 @@ export default function RegisterPage() {
 
               <p
                 className="
-                  mt-3
+                  mt-2
+                  text-sm
                   text-gray-400
-                  leading-[1.8]
+                  leading-6
                 "
               >
                 Sign up and start booking
@@ -324,13 +333,13 @@ export default function RegisterPage() {
             {/* FORM */}
             <form
               onSubmit={handleRegister}
-              className="mt-10 space-y-6"
+              className="mt-7 space-y-4"
             >
               {/* NAME */}
               <div>
                 <label
                   className="
-                    text-sm
+                    text-xs
                     text-gray-300
                   "
                 >
@@ -343,16 +352,16 @@ export default function RegisterPage() {
                     flex
                     items-center
                     gap-3
-                    rounded-2xl
+                    rounded-xl
                     border
                     border-white/10
                     bg-[#0B1727]
-                    px-5
-                    h-[58px]
+                    px-4
+                    h-[50px]
                     focus-within:border-cyan-400/50
                   "
                 >
-                  <FaUser className="text-cyan-400" />
+                  <FaUser className="text-cyan-400 text-sm" />
 
                   <input
                     type="text"
@@ -364,6 +373,7 @@ export default function RegisterPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -375,7 +385,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   className="
-                    text-sm
+                    text-xs
                     text-gray-300
                   "
                 >
@@ -388,16 +398,16 @@ export default function RegisterPage() {
                     flex
                     items-center
                     gap-3
-                    rounded-2xl
+                    rounded-xl
                     border
                     border-white/10
                     bg-[#0B1727]
-                    px-5
-                    h-[58px]
+                    px-4
+                    h-[50px]
                     focus-within:border-cyan-400/50
                   "
                 >
-                  <FaEnvelope className="text-cyan-400" />
+                  <FaEnvelope className="text-cyan-400 text-sm" />
 
                   <input
                     type="email"
@@ -409,6 +419,7 @@ export default function RegisterPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -420,7 +431,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   className="
-                    text-sm
+                    text-xs
                     text-gray-300
                   "
                 >
@@ -433,16 +444,16 @@ export default function RegisterPage() {
                     flex
                     items-center
                     gap-3
-                    rounded-2xl
+                    rounded-xl
                     border
                     border-white/10
                     bg-[#0B1727]
-                    px-5
-                    h-[58px]
+                    px-4
+                    h-[50px]
                     focus-within:border-cyan-400/50
                   "
                 >
-                  <FaImage className="text-cyan-400" />
+                  <FaImage className="text-cyan-400 text-sm" />
 
                   <input
                     type="text"
@@ -453,6 +464,7 @@ export default function RegisterPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -464,7 +476,7 @@ export default function RegisterPage() {
               <div>
                 <label
                   className="
-                    text-sm
+                    text-xs
                     text-gray-300
                   "
                 >
@@ -477,10 +489,10 @@ export default function RegisterPage() {
                     flex
                     items-center
                     gap-3
-                    rounded-2xl
+                    rounded-xl
                     border
-                    px-5
-                    h-[58px]
+                    px-4
+                    h-[50px]
                     bg-[#0B1727]
                     transition-all
                     duration-300
@@ -492,7 +504,7 @@ export default function RegisterPage() {
                     }
                   `}
                 >
-                  <FaLock className="text-cyan-400" />
+                  <FaLock className="text-cyan-400 text-sm" />
 
                   <input
                     type="password"
@@ -504,6 +516,7 @@ export default function RegisterPage() {
                       w-full
                       bg-transparent
                       outline-none
+                      text-sm
                       text-white
                       placeholder:text-gray-500
                     "
@@ -515,7 +528,7 @@ export default function RegisterPage() {
                   <p
                     className="
                       mt-2
-                      text-sm
+                      text-xs
                       text-red-400
                     "
                   >
@@ -528,7 +541,7 @@ export default function RegisterPage() {
                   className="
                     mt-3
                     space-y-1
-                    text-sm
+                    text-xs
                   "
                 >
                   <p
@@ -585,16 +598,16 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="
                   w-full
-                  h-[58px]
-                  rounded-2xl
+                  h-[50px]
+                  rounded-xl
                   bg-cyan-400
                   text-black
                   font-bold
-                  text-lg
+                  text-sm
                   transition-all
                   duration-300
                   hover:bg-cyan-300
-                  shadow-[0_0_30px_rgba(34,211,238,0.35)]
+                  shadow-[0_0_25px_rgba(34,211,238,0.35)]
                 "
               >
                 {loading
@@ -608,12 +621,12 @@ export default function RegisterPage() {
                   flex
                   items-center
                   gap-4
-                  py-2
+                  py-1
                 "
               >
                 <div className="flex-1 h-[1px] bg-white/10" />
 
-                <span className="text-gray-500 text-sm">
+                <span className="text-gray-500 text-xs">
                   OR
                 </span>
 
@@ -626,8 +639,8 @@ export default function RegisterPage() {
                 onClick={handleGoogleLogin}
                 className="
                   w-full
-                  h-[58px]
-                  rounded-2xl
+                  h-[50px]
+                  rounded-xl
                   border
                   border-white/10
                   bg-white/5
@@ -639,10 +652,11 @@ export default function RegisterPage() {
                   justify-center
                   gap-3
                   text-white
+                  text-sm
                   font-semibold
                 "
               >
-                <FaGoogle className="text-cyan-400" />
+                <FaGoogle className="text-cyan-400 text-sm" />
 
                 Continue with Google
               </button>
@@ -652,7 +666,8 @@ export default function RegisterPage() {
                 className="
                   text-center
                   text-gray-400
-                  mt-6
+                  text-sm
+                  pt-1
                 "
               >
                 Already have an account?{" "}

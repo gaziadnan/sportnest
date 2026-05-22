@@ -18,9 +18,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-import {
-  MdGroups,
-} from "react-icons/md";
+import { MdGroups } from "react-icons/md";
 
 export default function ManageFacilitiesPage() {
   const [facilities, setFacilities] =
@@ -39,6 +37,16 @@ export default function ManageFacilitiesPage() {
     setEditingFacility,
   ] = useState(null);
 
+  const [
+    deleteModalOpen,
+    setDeleteModalOpen,
+  ] = useState(false);
+
+  const [
+    deletingFacilityId,
+    setDeletingFacilityId,
+  ] = useState(null);
+
   const [slotInput, setSlotInput] =
     useState("");
 
@@ -52,7 +60,7 @@ export default function ManageFacilitiesPage() {
     if (!user?.email) return;
 
     fetch(
-      `http://localhost:8000/facilities/my-facilities?email=${user.email}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/my-facilities?email=${user.email}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -65,20 +73,18 @@ export default function ManageFacilitiesPage() {
       });
   }, [user]);
 
+  /* OPEN DELETE MODAL */
+  const openDeleteModal = (id) => {
+    setDeletingFacilityId(id);
+
+    setDeleteModalOpen(true);
+  };
+
   /* DELETE */
-  const handleDelete = async (
-    id
-  ) => {
-    const confirmDelete =
-      confirm(
-        "Delete this facility?"
-      );
-
-    if (!confirmDelete) return;
-
+  const handleDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:8000/facilities/${id}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${deletingFacilityId}`,
         {
           method: "DELETE",
         }
@@ -97,11 +103,16 @@ export default function ManageFacilitiesPage() {
         const remaining =
           facilities.filter(
             (item) =>
-              item._id !== id
+              item._id !==
+              deletingFacilityId
           );
 
         setFacilities(
           remaining
+        );
+
+        setDeleteModalOpen(
+          false
         );
       }
     } catch (error) {
@@ -196,7 +207,7 @@ export default function ManageFacilitiesPage() {
       try {
         const res =
           await fetch(
-            `http://localhost:8000/facilities/${editingFacility._id}`,
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities/${editingFacility._id}`,
             {
               method: "PUT",
 
@@ -321,12 +332,8 @@ export default function ManageFacilitiesPage() {
                 h-[45px]
                 px-5
                 rounded-xl
-
                 bg-cyan-600
-             hover:bg-cyan-500
-
-
-               
+                hover:bg-cyan-500
                 transition-all
                 duration-300
                 text-white
@@ -656,7 +663,7 @@ export default function ManageFacilitiesPage() {
                     {/* DELETE */}
                     <button
                       onClick={() =>
-                        handleDelete(
+                        openDeleteModal(
                           facility._id
                         )
                       }
@@ -685,474 +692,594 @@ export default function ManageFacilitiesPage() {
         </div>
       </section>
 
-      {/* EDIT MODAL */}
-      {isEditModalOpen &&
-  editingFacility && (
-    <div
-      className="
-        fixed
-        inset-0
-        bg-black/50
-        backdrop-blur-sm
-        z-50
-        flex
-        items-center
-        justify-center
-        p-3
-      "
-    >
-      <div
-        className="
-          w-full
-          max-w-lg
-          bg-white
-          rounded-2xl
-          shadow-2xl
-          overflow-hidden
-        "
-      >
-        {/* HEADER */}
+      {/* DELETE MODAL */}
+      {deleteModalOpen && (
         <div
           className="
+            fixed
+            inset-0
+            z-50
+            bg-black/60
+            backdrop-blur-sm
             flex
             items-center
-            justify-between
-            px-4
-            py-3
-            border-b
+            justify-center
+            p-4
           "
         >
-          <h2
+          <div
             className="
-              text-base
-              font-bold
-              text-gray-800
+              w-full
+              max-w-sm
+              rounded-2xl
+              bg-[#0f172a]
+              border
+              border-white/10
+              p-6
+              shadow-2xl
+              animate-in
+              fade-in
+              zoom-in-95
+              duration-200
             "
           >
-            Edit Facility
-          </h2>
+            <div
+              className="
+                w-14
+                h-14
+                rounded-full
+                bg-red-500/15
+                flex
+                items-center
+                justify-center
+                mx-auto
+              "
+            >
+              <FaTrashAlt className="text-red-400 text-lg" />
+            </div>
 
-          <button
-            onClick={() =>
-              setIsEditModalOpen(
-                false
-              )
-            }
+            <h2
+              className="
+                text-xl
+                font-bold
+                text-white
+                text-center
+                mt-4
+              "
+            >
+              Delete Facility?
+            </h2>
+
+            <p
+              className="
+                text-sm
+                text-gray-400
+                text-center
+                mt-2
+                leading-6
+              "
+            >
+              Are you sure you want
+              to remove this
+              facility? This action
+              cannot be undone.
+            </p>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() =>
+                  setDeleteModalOpen(
+                    false
+                  )
+                }
+                className="
+                  flex-1
+                  h-11
+                  rounded-xl
+                  border
+                  border-white/10
+                  bg-white/5
+                  text-sm
+                  font-medium
+                  text-white
+                  hover:bg-white/10
+                  transition-all
+                "
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={
+                  handleDelete
+                }
+                className="
+                  flex-1
+                  h-11
+                  rounded-xl
+                  bg-red-500
+                  hover:bg-red-600
+                  text-white
+                  text-sm
+                  font-semibold
+                  transition-all
+                "
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT MODAL */}
+      {isEditModalOpen &&
+        editingFacility && (
+          <div
             className="
-              w-7
-              h-7
-              rounded-lg
-              hover:bg-gray-100
+              fixed
+              inset-0
+              bg-black/50
+              backdrop-blur-sm
+              z-50
               flex
               items-center
               justify-center
-              text-gray-500
-              text-sm
+              p-3
             "
           >
-            <FaTimes />
-          </button>
-        </div>
-
-        {/* FORM */}
-        <form
-          onSubmit={
-            handleUpdateFacility
-          }
-          className="
-            p-4
-            space-y-3
-          "
-        >
-          {/* NAME */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
-              "
-            >
-              Facility Name
-            </label>
-
-            <input
-              type="text"
-              name="name"
-              defaultValue={
-                editingFacility.name
-              }
+            <div
               className="
                 w-full
-                h-9
-                px-3
-                mt-1
-                rounded-lg
-                border
-                border-gray-300
-                outline-none
-                text-xs
-              "
-            />
-          </div>
-
-          {/* SPORT */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
+                max-w-lg
+                bg-white
+                rounded-2xl
+                shadow-2xl
+                overflow-hidden
               "
             >
-              Sport Type
-            </label>
-
-            <select
-              name="facility_type"
-              defaultValue={
-                editingFacility.facility_type
-              }
-              className="
-                w-full
-                h-9
-                px-3
-                mt-1
-                rounded-lg
-                border
-                border-gray-300
-                outline-none
-                text-xs
-              "
-            >
-              <option>
-                Football
-              </option>
-
-              <option>
-                Cricket
-              </option>
-
-              <option>
-                Tennis
-              </option>
-
-              <option>
-                Swimming
-              </option>
-
-              <option>
-                Basketball
-              </option>
-            </select>
-          </div>
-
-          {/* IMAGE */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
-              "
-            >
-              Image URL
-            </label>
-
-            <input
-              type="text"
-              name="image"
-              defaultValue={
-                editingFacility.image
-              }
-              className="
-                w-full
-                h-9
-                px-3
-                mt-1
-                rounded-lg
-                border
-                border-gray-300
-                outline-none
-                text-xs
-              "
-            />
-          </div>
-
-          {/* LOCATION */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
-              "
-            >
-              Location
-            </label>
-
-            <input
-              type="text"
-              name="location"
-              defaultValue={
-                editingFacility.location
-              }
-              className="
-                w-full
-                h-9
-                px-3
-                mt-1
-                rounded-lg
-                border
-                border-gray-300
-                outline-none
-                text-xs
-              "
-            />
-          </div>
-
-          {/* PRICE + CAPACITY */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label
+              {/* HEADER */}
+              <div
                 className="
-                  text-[10px]
-                  font-semibold
-                  text-gray-500
-                  uppercase
-                "
-              >
-                Price/hr
-              </label>
-
-              <input
-                type="number"
-                name="price_per_hour"
-                defaultValue={
-                  editingFacility.price_per_hour
-                }
-                className="
-                  w-full
-                  h-9
-                  px-3
-                  mt-1
-                  rounded-lg
-                  border
-                  border-gray-300
-                  outline-none
-                  text-xs
-                "
-              />
-            </div>
-
-            <div>
-              <label
-                className="
-                  text-[10px]
-                  font-semibold
-                  text-gray-500
-                  uppercase
-                "
-              >
-                Capacity
-              </label>
-
-              <input
-                type="number"
-                name="capacity"
-                defaultValue={
-                  editingFacility.capacity
-                }
-                className="
-                  w-full
-                  h-9
-                  px-3
-                  mt-1
-                  rounded-lg
-                  border
-                  border-gray-300
-                  outline-none
-                  text-xs
-                "
-              />
-            </div>
-          </div>
-
-          {/* SLOT */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
-              "
-            >
-              Available Slots
-            </label>
-
-            <div className="flex gap-2 mt-1">
-              <input
-                type="text"
-                value={slotInput}
-                onChange={(e) =>
-                  setSlotInput(
-                    e.target.value
-                  )
-                }
-                placeholder="09:00 AM - 10:00 AM"
-                className="
-                  flex-1
-                  h-9
-                  px-3
-                  rounded-lg
-                  border
-                  border-gray-300
-                  outline-none
-                  text-xs
-                "
-              />
-
-              <button
-                type="button"
-                onClick={
-                  handleAddSlot
-                }
-                className="
-                  w-9
-                  h-9
-                  rounded-lg
-                  bg-cyan-600
-                  hover:bg-cyan-500
-                  text-white
                   flex
                   items-center
-                  justify-center
-                  text-xs
+                  justify-between
+                  px-4
+                  py-3
+                  border-b
                 "
               >
-                <FaPlus />
-              </button>
-            </div>
+                <h2
+                  className="
+                    text-base
+                    font-bold
+                    text-gray-800
+                  "
+                >
+                  Edit Facility
+                </h2>
 
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {editingFacility?.available_slots?.map(
-                (
-                  slot,
-                  index
-                ) => (
-                  <div
-                    key={index}
+                <button
+                  onClick={() =>
+                    setIsEditModalOpen(
+                      false
+                    )
+                  }
+                  className="
+                    w-7
+                    h-7
+                    rounded-lg
+                    hover:bg-gray-100
+                    flex
+                    items-center
+                    justify-center
+                    text-gray-500
+                    text-sm
+                  "
+                >
+                  <FaTimes />
+                </button>
+              </div>
+
+              {/* FORM */}
+              <form
+                onSubmit={
+                  handleUpdateFacility
+                }
+                className="
+                  p-4
+                  space-y-3
+                "
+              >
+                {/* NAME */}
+                <div>
+                  <label
                     className="
-                      px-2
-                      py-1
-                      rounded-full
-                      bg-cyan-100
-                      text-cyan-700
                       text-[10px]
-                      flex
-                      items-center
-                      gap-1
+                      font-semibold
+                      text-gray-500
+                      uppercase
                     "
                   >
-                    {slot}
+                    Facility Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="name"
+                    defaultValue={
+                      editingFacility.name
+                    }
+                    className="
+                      w-full
+                      h-9
+                      px-3
+                      mt-1
+                      rounded-lg
+                      border
+                      border-gray-300
+                      outline-none
+                      text-xs
+                    "
+                  />
+                </div>
+
+                {/* SPORT */}
+                <div>
+                  <label
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-gray-500
+                      uppercase
+                    "
+                  >
+                    Sport Type
+                  </label>
+
+                  <select
+                    name="facility_type"
+                    defaultValue={
+                      editingFacility.facility_type
+                    }
+                    className="
+                      w-full
+                      h-9
+                      px-3
+                      mt-1
+                      rounded-lg
+                      border
+                      border-gray-300
+                      outline-none
+                      text-xs
+                    "
+                  >
+                    <option>
+                      Football
+                    </option>
+
+                    <option>
+                      Cricket
+                    </option>
+
+                    <option>
+                      Tennis
+                    </option>
+
+                    <option>
+                      Swimming
+                    </option>
+
+                    <option>
+                      Basketball
+                    </option>
+                  </select>
+                </div>
+
+                {/* IMAGE */}
+                <div>
+                  <label
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-gray-500
+                      uppercase
+                    "
+                  >
+                    Image URL
+                  </label>
+
+                  <input
+                    type="text"
+                    name="image"
+                    defaultValue={
+                      editingFacility.image
+                    }
+                    className="
+                      w-full
+                      h-9
+                      px-3
+                      mt-1
+                      rounded-lg
+                      border
+                      border-gray-300
+                      outline-none
+                      text-xs
+                    "
+                  />
+                </div>
+
+                {/* LOCATION */}
+                <div>
+                  <label
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-gray-500
+                      uppercase
+                    "
+                  >
+                    Location
+                  </label>
+
+                  <input
+                    type="text"
+                    name="location"
+                    defaultValue={
+                      editingFacility.location
+                    }
+                    className="
+                      w-full
+                      h-9
+                      px-3
+                      mt-1
+                      rounded-lg
+                      border
+                      border-gray-300
+                      outline-none
+                      text-xs
+                    "
+                  />
+                </div>
+
+                {/* PRICE + CAPACITY */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      className="
+                        text-[10px]
+                        font-semibold
+                        text-gray-500
+                        uppercase
+                      "
+                    >
+                      Price/hr
+                    </label>
+
+                    <input
+                      type="number"
+                      name="price_per_hour"
+                      defaultValue={
+                        editingFacility.price_per_hour
+                      }
+                      className="
+                        w-full
+                        h-9
+                        px-3
+                        mt-1
+                        rounded-lg
+                        border
+                        border-gray-300
+                        outline-none
+                        text-xs
+                      "
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="
+                        text-[10px]
+                        font-semibold
+                        text-gray-500
+                        uppercase
+                      "
+                    >
+                      Capacity
+                    </label>
+
+                    <input
+                      type="number"
+                      name="capacity"
+                      defaultValue={
+                        editingFacility.capacity
+                      }
+                      className="
+                        w-full
+                        h-9
+                        px-3
+                        mt-1
+                        rounded-lg
+                        border
+                        border-gray-300
+                        outline-none
+                        text-xs
+                      "
+                    />
+                  </div>
+                </div>
+
+                {/* SLOT */}
+                <div>
+                  <label
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-gray-500
+                      uppercase
+                    "
+                  >
+                    Available Slots
+                  </label>
+
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      type="text"
+                      value={slotInput}
+                      onChange={(e) =>
+                        setSlotInput(
+                          e.target.value
+                        )
+                      }
+                      placeholder="09:00 AM - 10:00 AM"
+                      className="
+                        flex-1
+                        h-9
+                        px-3
+                        rounded-lg
+                        border
+                        border-gray-300
+                        outline-none
+                        text-xs
+                      "
+                    />
 
                     <button
                       type="button"
-                      onClick={() =>
-                        handleRemoveSlot(
-                          slot
-                        )
+                      onClick={
+                        handleAddSlot
                       }
+                      className="
+                        w-9
+                        h-9
+                        rounded-lg
+                        bg-cyan-600
+                        hover:bg-cyan-500
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                        text-xs
+                      "
                     >
-                      ×
+                      <FaPlus />
                     </button>
                   </div>
-                )
-              )}
+
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {editingFacility?.available_slots?.map(
+                      (
+                        slot,
+                        index
+                      ) => (
+                        <div
+                          key={index}
+                          className="
+                            px-2
+                            py-1
+                            rounded-full
+                            bg-cyan-100
+                            text-cyan-700
+                            text-[10px]
+                            flex
+                            items-center
+                            gap-1
+                          "
+                        >
+                          {slot}
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveSlot(
+                                slot
+                              )
+                            }
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* DESCRIPTION */}
+                <div>
+                  <label
+                    className="
+                      text-[10px]
+                      font-semibold
+                      text-gray-500
+                      uppercase
+                    "
+                  >
+                    Description
+                  </label>
+
+                  <textarea
+                    name="description"
+                    rows="2"
+                    defaultValue={
+                      editingFacility.description
+                    }
+                    className="
+                      w-full
+                      p-3
+                      mt-1
+                      rounded-lg
+                      border
+                      border-gray-300
+                      outline-none
+                      resize-none
+                      text-xs
+                    "
+                  />
+                </div>
+
+                {/* BUTTONS */}
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsEditModalOpen(
+                        false
+                      )
+                    }
+                    className="
+                      flex-1
+                      h-9
+                      rounded-lg
+                      border
+                      border-gray-300
+                      text-xs
+                      font-medium
+                    "
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="
+                      flex-1
+                      h-9
+                      rounded-lg
+                      bg-cyan-600
+                      hover:bg-cyan-500
+                      text-white
+                      text-xs
+                      font-medium
+                      transition-all
+                    "
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-
-          {/* DESCRIPTION */}
-          <div>
-            <label
-              className="
-                text-[10px]
-                font-semibold
-                text-gray-500
-                uppercase
-              "
-            >
-              Description
-            </label>
-
-            <textarea
-              name="description"
-              rows="2"
-              defaultValue={
-                editingFacility.description
-              }
-              className="
-                w-full
-                p-3
-                mt-1
-                rounded-lg
-                border
-                border-gray-300
-                outline-none
-                resize-none
-                text-xs
-              "
-            />
-          </div>
-
-          {/* BUTTONS */}
-          <div className="flex gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() =>
-                setIsEditModalOpen(
-                  false
-                )
-              }
-              className="
-                flex-1
-                h-9
-                rounded-lg
-                border
-                border-gray-300
-                text-xs
-                font-medium
-              "
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="
-                flex-1
-                h-9
-                rounded-lg
-                bg-cyan-600
-                hover:bg-cyan-500
-                text-white
-                text-xs
-                font-medium
-                transition-all
-              "
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )}
+        )}
     </>
   );
 }

@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SportNest 🏟️
 
-## Getting Started
+SportNest is a modern sports facility booking platform where users can explore, book, and manage premium sports venues easily.
 
-First, run the development server:
+---
+
+# Live Website
+
+ Live Link: https://sportnest-nu.vercel.app
+
+
+---
+
+# Features
+
+- User Authentication System
+- Email & Password Login/Register
+- Google Authentication
+- Premium Responsive UI Design
+- Sports Facility Booking System
+- Booking Confirmation
+- Protected Private Routes
+- Dynamic Facility Details Page
+- Real-time Toast Notifications
+- User Booking Management
+- MongoDB Database Integration
+- Modern Glassmorphism Design
+- Fully Responsive For Mobile & Desktop
+
+---
+
+# Technologies Used
+
+## Frontend
+
+- Next.js
+- React.js
+- Tailwind CSS
+- Framer Motion
+- React Icons
+- React Hot Toast
+
+## Backend
+
+- Node.js
+- Express.js
+- MongoDB
+
+## Authentication
+
+- Better Auth
+
+---
+
+# Installation & Setup
+
+## Clone Repository
+
+```bash
+git clone https://github.com/gaziadnan/sportnest-client.git
+```
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+## Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+# Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file in the root directory.
 
-## Learn More
+```env
+NEXT_PUBLIC_SERVER_URL=your_server_url
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Pages Included
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Home Page
+- Login Page
+- Register Page
+- Facilities Page
+- Facility Details Page
+- Book Facility Page
+- My Bookings Page
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Authentication Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Secure Registration
+- Login Validation
+- Google Login
+- Protected Routes
+- Session Management
+
+---
+
+# Booking Features
+
+- Facility Selection
+- Time Slot Selection
+- Date Selection
+- Booking Duration
+- Total Price Calculation
+- Booking Confirmation
+
+---
+
+# UI/UX Features
+
+- Premium Dark Theme
+- Responsive Design
+- Smooth Animations
+- Modern Card Layout
+- Interactive Hover Effects
+- Glassmorphism Components
+
+---
+
+# Author
+
+Developed by Gazi Adnan

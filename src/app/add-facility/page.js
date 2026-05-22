@@ -96,7 +96,7 @@ export default function AddFacilityPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:8000/facilities",
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities`,
         {
          
           method: "POST",

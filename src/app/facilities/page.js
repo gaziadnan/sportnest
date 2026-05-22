@@ -55,7 +55,7 @@ export default function FacilitiesPage() {
   /* FETCH DATA */
   useEffect(() => {
     fetch(
-      `http://localhost:8000/facilities?page=${currentPage}`
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/facilities?page=${currentPage}`
     )
       .then((res) => res.json())
       .then((data) => {
